@@ -1,0 +1,2030 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Elevia Clinic Manager</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌿</text></svg>"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --teal:   #35dcc2; --mint: #78eaca; --navy: #0f2137; --dark: #1a2b3c;
+      --text:   #2d3748; --muted: #718096; --light: #f0faf8; --border: #e2e8f0;
+      --white:  #ffffff;
+      --grad:   linear-gradient(135deg, #35dcc2, #78eaca);
+      --shadow: 0 4px 24px rgba(53,220,194,.10);
+      --r:      14px;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family:'Inter',sans-serif; background:var(--light); color:var(--text); min-height:100vh; }
+
+    /* ── HEADER ── */
+    header {
+      background:var(--navy); height:60px; padding:0 32px;
+      display:flex; align-items:center; gap:14px;
+      position:sticky; top:0; z-index:50;
+      box-shadow:0 2px 16px rgba(0,0,0,.2);
+    }
+    .logo { font-size:1.4rem; }
+    .header-title {
+      font-size:1rem; font-weight:700;
+      background:var(--grad); -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+    }
+    .header-divider { width:1px; height:20px; background:rgba(255,255,255,.15); }
+    .header-sub { font-size:.8rem; color:rgba(255,255,255,.4); }
+    .header-nav { margin-left:auto; display:flex; gap:8px; }
+    .nav-btn {
+      padding:7px 16px; border-radius:8px; border:none; font-family:inherit;
+      font-size:.82rem; font-weight:600; cursor:pointer; transition:all .2s;
+      display:flex; align-items:center; gap:6px;
+    }
+    .nav-btn.home { background:rgba(255,255,255,.08); color:rgba(255,255,255,.7); }
+    .nav-btn.home:hover { background:rgba(255,255,255,.15); color:#fff; }
+    .nav-btn.back { background:rgba(53,220,194,.15); color:var(--mint); }
+    .nav-btn.back:hover { background:rgba(53,220,194,.25); }
+    .nav-btn.onboard { background:var(--grad); color:#fff; box-shadow:0 2px 12px rgba(53,220,194,.3); }
+    .nav-btn.onboard:hover { transform:translateY(-1px); box-shadow:0 4px 18px rgba(53,220,194,.4); }
+    .nav-btn[hidden] { display:none; }
+
+    /* ── VIEWS ── */
+    .view { display:none; }
+    .view.active { display:block; }
+
+    /* ── HOME ── */
+    .home-wrap { max-width:1100px; margin:0 auto; padding:36px 24px 80px; }
+    .dashboard-header {
+      margin-bottom:28px; display:flex; align-items:flex-start;
+      justify-content:space-between; gap:16px;
+    }
+    .dashboard-header-text h1 { font-size:1.6rem; font-weight:800; color:var(--dark); margin-bottom:4px; }
+    .dashboard-header-text p  { font-size:.9rem; color:var(--muted); }
+    .onboard-cta {
+      display:inline-flex; align-items:center; gap:8px;
+      padding:11px 22px; border-radius:10px; border:none; font-family:inherit;
+      font-size:.9rem; font-weight:700; cursor:pointer;
+      background:var(--grad); color:#fff;
+      box-shadow:0 4px 16px rgba(53,220,194,.3);
+      transition:all .2s; white-space:nowrap; flex-shrink:0;
+    }
+    .onboard-cta:hover { transform:translateY(-1px); box-shadow:0 8px 24px rgba(53,220,194,.4); }
+    .search-bar {
+      display:flex; gap:12px; align-items:center;
+      background:var(--white); border:1.5px solid var(--border);
+      border-radius:12px; padding:10px 18px; margin-bottom:28px;
+      box-shadow:var(--shadow); transition:border-color .2s;
+    }
+    .search-bar:focus-within { border-color:var(--teal); }
+    .search-bar .s-icon { font-size:1.1rem; color:var(--muted); flex-shrink:0; }
+    .search-bar input { flex:1; border:none; outline:none; font-family:inherit; font-size:.95rem; color:var(--text); background:none; }
+    .search-bar input::placeholder { color:var(--muted); }
+    .search-count { font-size:.8rem; color:var(--muted); white-space:nowrap; }
+    .clinic-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(320px,1fr)); gap:18px; }
+    .clinic-card {
+      background:var(--white); border:1.5px solid var(--border);
+      border-radius:var(--r); padding:0; overflow:hidden;
+      cursor:pointer; transition:transform .2s, box-shadow .2s, border-color .2s;
+      box-shadow:var(--shadow);
+    }
+    .clinic-card:hover { transform:translateY(-3px); box-shadow:0 12px 36px rgba(53,220,194,.15); border-color:var(--teal); }
+    .clinic-card-top { background:var(--grad); padding:20px 22px 16px; display:flex; align-items:flex-start; gap:14px; }
+    .clinic-avatar { width:44px; height:44px; border-radius:12px; background:rgba(255,255,255,.25); display:flex; align-items:center; justify-content:center; font-size:1.3rem; flex-shrink:0; }
+    .clinic-card-top h3 { font-size:1rem; font-weight:700; color:#fff; line-height:1.3; }
+    .clinic-card-top .c-site { font-size:.75rem; color:rgba(255,255,255,.7); margin-top:3px; }
+    .clinic-card-body { padding:16px 22px 20px; }
+    .clinic-meta { display:flex; flex-direction:column; gap:7px; }
+    .clinic-meta-row { display:flex; align-items:center; gap:8px; font-size:.83rem; color:var(--muted); }
+    .clinic-meta-row .mi { font-size:.95rem; width:18px; text-align:center; }
+    .clinic-footer { display:flex; align-items:center; justify-content:space-between; margin-top:14px; padding-top:14px; border-top:1px solid var(--border); }
+    .provider-pill { background:rgba(53,220,194,.1); color:#1a9e8e; border-radius:20px; padding:4px 12px; font-size:.76rem; font-weight:700; }
+    .view-btn { font-size:.8rem; font-weight:600; color:var(--teal); display:flex; align-items:center; gap:4px; }
+    .state-msg { text-align:center; padding:72px 24px; color:var(--muted); }
+    .state-msg .icon { font-size:3rem; margin-bottom:16px; }
+    .state-msg p { font-size:.95rem; line-height:1.6; }
+
+    /* ── DETAIL VIEW ── */
+    .detail-wrap { max-width:1100px; margin:0 auto; padding:32px 24px 80px; }
+    .detail-header { display:flex; align-items:flex-start; gap:18px; margin-bottom:28px; }
+    .detail-avatar { width:56px; height:56px; border-radius:14px; background:var(--grad); display:flex; align-items:center; justify-content:center; font-size:1.6rem; flex-shrink:0; }
+    .detail-header h1 { font-size:1.5rem; font-weight:800; color:var(--dark); }
+    .detail-header .d-sub { font-size:.88rem; color:var(--muted); margin-top:4px; }
+    .detail-actions { margin-left:auto; display:flex; gap:10px; }
+    .btn { display:inline-flex; align-items:center; gap:7px; padding:10px 20px; border-radius:10px; font-family:inherit; font-size:.88rem; font-weight:600; cursor:pointer; border:none; transition:all .2s; }
+    .btn-outline { background:none; border:1.5px solid var(--border); color:var(--dark); }
+    .btn-outline:hover { border-color:var(--teal); color:var(--teal); }
+    .btn-teal { background:var(--grad); color:#fff; box-shadow:0 4px 16px rgba(53,220,194,.25); }
+    .btn-teal:hover { transform:translateY(-1px); }
+    .dtabs { display:flex; gap:4px; background:var(--white); border:1.5px solid var(--border); border-radius:12px; padding:5px; margin-bottom:22px; width:fit-content; }
+    .dtab { padding:9px 22px; border-radius:9px; border:none; background:none; font-family:inherit; font-size:.88rem; font-weight:500; color:var(--muted); cursor:pointer; transition:all .2s; display:flex; align-items:center; gap:6px; }
+    .dtab.active { background:var(--grad); color:#fff; box-shadow:0 2px 10px rgba(53,220,194,.3); }
+    .card { background:var(--white); border:1.5px solid var(--border); border-radius:var(--r); padding:28px 32px; box-shadow:var(--shadow); }
+    .section-label { font-size:.7rem; font-weight:700; color:var(--teal); text-transform:uppercase; letter-spacing:.8px; margin-bottom:14px; }
+    .attr-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:8px; }
+    .attr-item label { display:block; font-size:.72rem; font-weight:600; color:var(--muted); margin-bottom:4px; }
+    .attr-item .val  { font-size:.88rem; color:var(--dark); line-height:1.5; }
+    .attr-item.full  { grid-column:1/-1; }
+    .chip-row { display:flex; flex-wrap:wrap; gap:6px; margin-top:4px; }
+    .chip { background:rgba(53,220,194,.1); color:#1a9e8e; border:1px solid rgba(53,220,194,.2); border-radius:20px; padding:3px 11px; font-size:.74rem; font-weight:600; }
+    .chip.ins { background:#eef4ff; color:#3a74db; border-color:rgba(79,142,247,.2); }
+    .divider { border:none; border-top:1px solid var(--border); margin:24px 0; }
+    .provider-block { border:1.5px solid var(--border); border-radius:12px; padding:18px 22px; margin-bottom:14px; transition:border-color .2s; }
+    .provider-block:hover { border-color:rgba(53,220,194,.4); }
+    .pb-top { display:flex; align-items:flex-start; gap:12px; margin-bottom:14px; }
+    .pb-avatar { width:38px; height:38px; border-radius:10px; background:var(--grad); display:flex; align-items:center; justify-content:center; font-size:1rem; flex-shrink:0; }
+    .pb-name  { font-weight:700; font-size:.95rem; color:var(--dark); }
+    .pb-badge { margin-left:auto; font-size:.7rem; font-weight:700; padding:3px 10px; border-radius:20px; }
+    .pb-badge.yes { background:#d1fae5; color:#065f46; }
+    .pb-badge.no  { background:#fee2e2; color:#991b1b; }
+    .pb-meta { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+    .pb-meta-item label { display:block; font-size:.7rem; font-weight:600; color:var(--muted); margin-bottom:3px; }
+    .pb-meta-item .val  { font-size:.83rem; color:var(--dark); line-height:1.4; }
+    .pb-meta-item.full  { grid-column:1/-1; }
+    .pb-desc { font-size:.82rem; color:var(--muted); line-height:1.6; margin-top:10px; font-style:italic; }
+    #graph-wrapper { display:flex; gap:16px; align-items:flex-start; }
+    #graph-container { flex:1; min-width:0; height:560px; border:1.5px solid var(--border); border-radius:var(--r); overflow:hidden; background:#f8fbff; }
+    #graph-svg { width:100%; height:100%; }
+    #detail-panel { width:270px; flex-shrink:0; background:var(--white); border:1.5px solid var(--border); border-radius:var(--r); padding:20px; box-shadow:var(--shadow); height:560px; overflow-y:auto; }
+    #detail-panel .dp-empty { color:var(--muted); font-size:.85rem; text-align:center; margin-top:40px; line-height:1.7; }
+    #detail-panel .dp-title { font-weight:800; color:var(--dark); font-size:.95rem; margin-bottom:4px; }
+    #detail-panel .dp-type  { font-size:.7rem; font-weight:700; color:var(--teal); text-transform:uppercase; letter-spacing:.5px; margin-bottom:16px; }
+    #detail-panel .dp-row   { margin-bottom:12px; }
+    #detail-panel .dp-label { font-size:.7rem; font-weight:600; color:var(--muted); display:block; margin-bottom:3px; }
+    #detail-panel .dp-val   { font-size:.84rem; color:var(--dark); line-height:1.5; }
+    .dp-chip { display:inline-block; background:rgba(53,220,194,.1); color:#1a9e8e; border-radius:20px; padding:3px 10px; font-size:.72rem; font-weight:600; margin:2px 3px 2px 0; }
+    .graph-hint { text-align:center; font-size:.79rem; color:var(--muted); margin-top:10px; }
+    .kb-link { display:inline-flex; align-items:center; gap:5px; font-size:.82rem; font-weight:600; color:var(--teal); cursor:pointer; border:none; background:none; padding:0; font-family:inherit; }
+    .kb-link:hover { text-decoration:underline; }
+
+    /* ── INTAKE MODAL ── */
+    .modal-overlay {
+      display:none; position:fixed; inset:0; background:rgba(15,33,55,.55);
+      z-index:200; align-items:center; justify-content:center; padding:24px;
+    }
+    .modal-overlay.open { display:flex; }
+    .modal-box {
+      background:var(--white); border-radius:var(--r); width:100%; max-width:720px;
+      max-height:88vh; display:flex; flex-direction:column;
+      box-shadow:0 24px 80px rgba(0,0,0,.25);
+    }
+    .modal-header {
+      padding:24px 28px 18px; border-bottom:1px solid var(--border);
+      display:flex; align-items:center; gap:12px; flex-shrink:0;
+    }
+    .modal-header h2 { font-size:1.15rem; font-weight:800; color:var(--dark); flex:1; }
+    .modal-close { background:none; border:none; font-size:1.4rem; color:var(--muted); cursor:pointer; line-height:1; padding:4px; }
+    .modal-close:hover { color:var(--dark); }
+    .modal-body { padding:24px 28px; overflow-y:auto; flex:1; }
+    .modal-section-heading {
+      font-size:.67rem; font-weight:700; letter-spacing:.8px; text-transform:uppercase;
+      color:var(--teal); margin:22px 0 10px; padding-bottom:6px;
+      border-bottom:1px solid rgba(53,220,194,.2);
+    }
+    .modal-section-heading:first-child { margin-top:0; }
+    .modal-qa-row { display:flex; gap:16px; align-items:flex-start; padding:8px 0; border-bottom:1px solid var(--border); }
+    .modal-qa-row:last-child { border-bottom:none; }
+    .modal-qa-q { flex:1; font-size:.84rem; color:var(--muted); line-height:1.5; }
+    .modal-qa-a { flex:1; font-size:.84rem; color:var(--dark); font-weight:600; line-height:1.5; }
+    .modal-qa-chips { display:flex; flex-wrap:wrap; gap:5px; }
+    .modal-qa-chip { background:rgba(53,220,194,.1); color:#1a9e8e; border:1px solid rgba(53,220,194,.2); border-radius:20px; padding:3px 10px; font-size:.74rem; font-weight:600; }
+    .modal-file-badge {
+      display:inline-flex; align-items:center; gap:6px; font-size:.75rem; color:var(--muted);
+      background:var(--light); border:1px solid var(--border); border-radius:8px; padding:5px 12px; margin-bottom:20px;
+    }
+
+    /* ── ONBOARD VIEW ── */
+    .steps { max-width:860px; margin:32px auto 0; padding:0 24px; display:flex; align-items:center; gap:0; }
+    .step { display:flex; align-items:center; flex:1; }
+    .step-dot { width:28px; height:28px; border-radius:50%; border:2px solid var(--border); background:var(--white); display:flex; align-items:center; justify-content:center; font-size:.72rem; font-weight:700; color:var(--muted); flex-shrink:0; transition:all .3s; }
+    .step-dot.active { background:var(--grad); border-color:transparent; color:#fff; }
+    .step-dot.done   { background:var(--teal);  border-color:transparent; color:#fff; }
+    .step-label { font-size:.68rem; color:var(--muted); margin-left:6px; white-space:nowrap; }
+    .step-label.active { color:var(--teal); font-weight:600; }
+    .step-line { flex:1; height:2px; background:var(--border); margin:0 6px; transition:background .3s; }
+    .step-line.done { background:var(--teal); }
+    .panel { display:none; }
+    .panel.active { display:block; }
+    .panel-wrap { max-width:760px; margin:24px auto 80px; padding:0 24px; }
+    .ob-card { background:var(--white); border:1px solid var(--border); border-radius:var(--r); padding:40px; box-shadow:var(--shadow); }
+    .ob-card h2 { font-size:1.4rem; font-weight:800; color:var(--dark); margin-bottom:8px; }
+    .ob-card .sub { font-size:.9rem; color:var(--muted); margin-bottom:32px; line-height:1.6; }
+    .form-group { margin-bottom:22px; }
+    .form-group label { display:block; font-size:.85rem; font-weight:600; color:var(--dark); margin-bottom:7px; }
+    .form-group input, .form-group textarea { width:100%; border:1.5px solid var(--border); border-radius:10px; padding:12px 16px; font-family:inherit; font-size:.95rem; color:var(--text); background:var(--white); outline:none; transition:border-color .2s; }
+    .form-group input:focus, .form-group textarea:focus { border-color:var(--teal); }
+    .form-hint { font-size:.76rem; color:var(--muted); margin-top:5px; }
+    .btn-primary { background:var(--grad); color:#fff; box-shadow:0 4px 20px rgba(53,220,194,.3); }
+    .btn-primary:hover { transform:translateY(-1px); box-shadow:0 8px 28px rgba(53,220,194,.4); }
+    .btn-primary:disabled { opacity:.5; cursor:not-allowed; transform:none; }
+    .loading-card { text-align:center; padding:60px 40px; }
+    .spinner-ring { width:56px; height:56px; border:5px solid var(--border); border-top-color:var(--teal); border-radius:50%; animation:spin .9s linear infinite; margin:0 auto 24px; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+    .loading-steps { margin-top:24px; text-align:left; max-width:360px; margin:24px auto 0; }
+    .lstep { display:flex; align-items:center; gap:10px; padding:8px 0; font-size:.87rem; color:var(--muted); }
+    .lstep .licon { font-size:1rem; width:22px; text-align:center; }
+    .lstep.done   { color:var(--teal); }
+    .lstep.active { color:var(--dark); font-weight:600; }
+    .review-tabs { display:flex; gap:4px; background:var(--light); border-radius:12px; padding:5px; margin-bottom:24px; }
+    .rtab { flex:1; padding:10px; border-radius:9px; border:none; background:none; font-family:inherit; font-size:.9rem; font-weight:500; color:var(--muted); cursor:pointer; transition:all .2s; display:flex; align-items:center; justify-content:center; gap:7px; }
+    .rtab.active { background:var(--white); color:var(--dark); box-shadow:0 2px 8px rgba(0,0,0,.07); }
+    .ob-section-label { font-size:.7rem; font-weight:700; color:var(--teal); text-transform:uppercase; letter-spacing:.8px; margin-bottom:12px; }
+    .ob-attr-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+    .ob-attr-item label { font-size:.75rem; font-weight:600; color:var(--muted); display:block; margin-bottom:4px; }
+    .ob-attr-item input, .ob-attr-item textarea { width:100%; border:1.5px solid var(--border); border-radius:8px; padding:9px 13px; font-family:inherit; font-size:.88rem; color:var(--text); outline:none; transition:border-color .2s; }
+    .ob-attr-item input:focus, .ob-attr-item textarea:focus { border-color:var(--teal); }
+    .ob-attr-item textarea { resize:vertical; }
+    .ob-attr-item.full { grid-column:1/-1; }
+    .chips-edit { display:flex; flex-wrap:wrap; gap:6px; margin-top:4px; }
+    .chip-tag { background:rgba(53,220,194,.12); color:#1a9e8e; border:1px solid rgba(53,220,194,.25); border-radius:20px; padding:4px 12px; font-size:.76rem; font-weight:600; }
+    .ob-provider-block { border:1px solid var(--border); border-radius:var(--r); padding:20px 24px; margin-bottom:16px; position:relative; }
+    .ob-provider-block .p-name  { font-weight:700; font-size:1rem; color:var(--dark); margin-bottom:4px; }
+    .ob-provider-block .p-title { font-size:.8rem; color:var(--muted); margin-bottom:14px; }
+    .accepting-badge { position:absolute; top:18px; right:20px; font-size:.72rem; font-weight:700; padding:3px 10px; border-radius:20px; }
+    .accepting-badge.yes { background:#d1fae5; color:#065f46; }
+    .accepting-badge.no  { background:#fee2e2; color:#991b1b; }
+    .ob-divider { border:none; border-top:1px solid var(--border); margin:28px 0; }
+    #ob-graph-wrapper { display:flex; gap:16px; align-items:flex-start; }
+    #ob-graph-container { flex:1; min-width:0; height:560px; border:1.5px solid var(--border); border-radius:var(--r); overflow:hidden; background:#f8fbff; }
+    #ob-graph-svg { width:100%; height:100%; }
+    #ob-detail-panel { width:260px; flex-shrink:0; background:var(--white); border:1.5px solid var(--border); border-radius:var(--r); padding:20px; box-shadow:var(--shadow); height:560px; overflow-y:auto; }
+    #ob-detail-panel .dp-title { font-weight:800; color:var(--dark); font-size:.95rem; margin-bottom:4px; }
+    #ob-detail-panel .dp-type  { font-size:.72rem; font-weight:700; color:var(--teal); text-transform:uppercase; letter-spacing:.5px; margin-bottom:14px; }
+    #ob-detail-panel .dp-row   { margin-bottom:10px; }
+    #ob-detail-panel .dp-label { font-size:.72rem; font-weight:600; color:var(--muted); display:block; margin-bottom:2px; }
+    #ob-detail-panel .dp-val   { font-size:.84rem; color:var(--dark); line-height:1.5; }
+    #ob-detail-panel .dp-chip  { display:inline-block; background:rgba(53,220,194,.12); color:#1a9e8e; border-radius:20px; padding:3px 10px; font-size:.72rem; font-weight:600; margin:2px 3px 2px 0; }
+    .save-bar { background:var(--white); border-top:1px solid var(--border); padding:20px 24px; display:flex; align-items:center; justify-content:space-between; border-radius:0 0 var(--r) var(--r); margin-top:32px; box-shadow:0 -4px 20px rgba(0,0,0,.05); }
+    .save-bar .save-info { font-size:.85rem; color:var(--muted); }
+    .save-bar .save-info strong { color:var(--dark); }
+    .success-card { text-align:center; padding:60px 40px; }
+    .success-icon { font-size:4rem; margin-bottom:20px; }
+    .success-card h2 { font-size:1.6rem; font-weight:800; color:var(--dark); margin-bottom:12px; }
+    .success-card p  { color:var(--muted); font-size:.95rem; line-height:1.7; max-width:440px; margin:0 auto 32px; }
+    .success-stats { display:flex; gap:32px; justify-content:center; margin-bottom:40px; }
+    .sstat strong { display:block; font-size:2rem; font-weight:800; color:var(--teal); line-height:1; }
+    .sstat span   { font-size:.8rem; color:var(--muted); }
+    .spinner { width:40px; height:40px; border:4px solid var(--border); border-top-color:var(--teal); border-radius:50%; animation:spin .8s linear infinite; margin:0 auto 16px; }
+    .error-box { background:#fef2f2; border:1px solid #fecaca; border-radius:10px; padding:14px 18px; font-size:.87rem; color:#dc2626; margin-top:16px; }
+
+    /* ══════════════════════════════════════════════════
+       INTAKE UI
+    ══════════════════════════════════════════════════ */
+    .intake-progress-wrap { display:flex; align-items:center; gap:12px; margin:20px 0 4px; }
+    .intake-progress-bar  { flex:1; height:6px; background:var(--border); border-radius:3px; overflow:hidden; }
+    .intake-progress-fill { height:100%; background:var(--grad); border-radius:3px; transition:width .4s cubic-bezier(.4,0,.2,1); width:0%; }
+    .intake-progress-label { font-size:.73rem; color:var(--muted); white-space:nowrap; min-width:90px; text-align:right; }
+
+    /* Animated question card */
+    .intake-question-card { min-height:280px; margin:28px 0 20px; }
+    @keyframes iq-in  { from { opacity:0; transform:translateX(28px); } to { opacity:1; transform:none; } }
+    @keyframes iq-out { from { opacity:1; transform:none; } to { opacity:0; transform:translateX(-28px); } }
+    .iq-animate { animation:iq-in .25s cubic-bezier(.4,0,.2,1) both; }
+
+    .iq-section { display:inline-block; font-size:.68rem; font-weight:700; letter-spacing:.7px; text-transform:uppercase; color:var(--teal); background:rgba(53,220,194,.08); border:1px solid rgba(53,220,194,.2); border-radius:20px; padding:3px 12px; margin-bottom:14px; }
+    .iq-question { font-size:1.18rem; font-weight:700; color:var(--dark); line-height:1.5; margin-bottom:8px; }
+    .iq-hint { font-size:.83rem; color:var(--muted); margin-bottom:22px; line-height:1.55; }
+
+    /* Yes / No */
+    .yn-row { display:flex; gap:14px; flex-wrap:wrap; }
+    .yn-btn {
+      flex:1; min-width:120px; padding:16px 24px;
+      border:2px solid var(--border); border-radius:12px; background:var(--white);
+      font-family:inherit; font-size:1rem; font-weight:700; color:var(--dark);
+      cursor:pointer; transition:all .2s; text-align:center;
+    }
+    .yn-btn:hover { border-color:var(--teal); color:var(--teal); }
+    .yn-btn.selected { background:var(--grad); border-color:transparent; color:#fff; box-shadow:0 4px 16px rgba(53,220,194,.35); }
+    .yn-btn.yn-no.selected { background:linear-gradient(135deg,#f87171,#fb923c); box-shadow:0 4px 16px rgba(248,113,113,.3); }
+
+    /* Radio cards */
+    .radio-cards { display:flex; flex-direction:column; gap:10px; }
+    .radio-card {
+      display:flex; align-items:center; gap:14px; padding:14px 18px;
+      border:2px solid var(--border); border-radius:12px; background:var(--white);
+      cursor:pointer; transition:all .2s;
+    }
+    .radio-card:hover { border-color:var(--teal); }
+    .radio-card.selected { border-color:var(--teal); background:rgba(53,220,194,.06); }
+    .radio-card input[type=radio] { accent-color:var(--teal); width:17px; height:17px; flex-shrink:0; }
+    .radio-card-label { font-size:.92rem; color:var(--dark); line-height:1.4; }
+
+    /* Chip multi-select */
+    .chip-select-wrap { display:flex; flex-wrap:wrap; gap:8px; }
+    .chip-sel {
+      padding:8px 16px; border:2px solid var(--border); border-radius:20px;
+      background:var(--white); font-family:inherit; font-size:.82rem; font-weight:600;
+      color:var(--muted); cursor:pointer; transition:all .18s; user-select:none;
+    }
+    .chip-sel:hover  { border-color:var(--teal); color:var(--teal); }
+    .chip-sel.selected { background:rgba(53,220,194,.12); border-color:var(--teal); color:#1a9e8e; }
+    .chip-other-input {
+      margin-top:10px; width:100%; border:1.5px solid var(--teal); border-radius:10px;
+      padding:10px 14px; font-family:inherit; font-size:.9rem; color:var(--text);
+      outline:none; display:none;
+    }
+    .chip-other-input.visible { display:block; animation:iq-in .2s both; }
+
+    /* Number input */
+    .iq-input { width:100%; border:1.5px solid var(--border); border-radius:10px; padding:12px 16px; font-family:inherit; font-size:.95rem; color:var(--text); outline:none; transition:border-color .2s; background:var(--white); }
+    .iq-input:focus { border-color:var(--teal); }
+    .iq-input-row { display:flex; gap:10px; align-items:center; }
+    .iq-unit { font-size:.88rem; color:var(--muted); }
+
+    /* Intake nav */
+    .intake-nav { display:flex; align-items:center; justify-content:space-between; padding-top:20px; border-top:1px solid var(--border); gap:12px; }
+    .btn-skip { background:none; border:1.5px solid var(--border); color:var(--muted); font-size:.82rem; padding:8px 16px; border-radius:8px; font-family:inherit; font-weight:600; cursor:pointer; transition:all .2s; }
+    .btn-skip:hover { border-color:var(--teal); color:var(--teal); }
+
+    /* Intake summary in review */
+    .intake-summary-section { margin-top:28px; padding-top:24px; border-top:1px solid var(--border); }
+    .intake-summary-row { display:flex; gap:12px; align-items:flex-start; margin-bottom:10px; font-size:.86rem; }
+    .isr-label { min-width:170px; max-width:170px; font-weight:600; color:var(--muted); font-size:.76rem; flex-shrink:0; padding-top:2px; }
+    .isr-val   { color:var(--dark); line-height:1.5; flex:1; }
+
+    /* ── EDIT CONTROLS ── */
+    .section-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
+    .section-header .section-label { margin-bottom:0; }
+    .entity-actions { display:flex; gap:6px; align-items:center; flex-shrink:0; }
+    .btn-edit   { display:inline-flex; align-items:center; gap:4px; padding:5px 12px; border:1.5px solid var(--border); border-radius:8px; background:var(--white); color:var(--muted); font-family:inherit; font-size:.74rem; font-weight:600; cursor:pointer; transition:all .18s; }
+    .btn-edit:hover { border-color:var(--teal); color:var(--teal); }
+    .btn-save   { display:inline-flex; align-items:center; gap:4px; padding:5px 13px; border:none; border-radius:8px; background:var(--grad); color:#fff; font-family:inherit; font-size:.74rem; font-weight:600; cursor:pointer; box-shadow:0 2px 8px rgba(53,220,194,.3); transition:all .18s; }
+    .btn-save:hover { transform:translateY(-1px); }
+    .btn-save:disabled { opacity:.5; cursor:not-allowed; transform:none; }
+    .btn-cancel { display:inline-flex; align-items:center; gap:4px; padding:5px 12px; border:1.5px solid var(--border); border-radius:8px; background:var(--white); color:var(--muted); font-family:inherit; font-size:.74rem; font-weight:600; cursor:pointer; transition:all .18s; }
+    .btn-cancel:hover { border-color:var(--muted); color:var(--dark); }
+    .btn-danger { display:inline-flex; align-items:center; gap:4px; padding:5px 12px; border:1.5px solid #fecaca; border-radius:8px; background:var(--white); color:#dc2626; font-family:inherit; font-size:.74rem; font-weight:600; cursor:pointer; transition:all .18s; }
+    .btn-danger:hover { background:#fee2e2; }
+    .edit-toolbar { display:flex; gap:8px; align-items:center; padding:16px 0 0; border-top:1px solid var(--border); margin-top:16px; }
+    .confirm-row { display:flex; align-items:center; gap:10px; padding:10px 14px; background:#fef2f2; border:1px solid #fecaca; border-radius:8px; font-size:.82rem; color:#dc2626; margin-top:8px; }
+    .confirm-row span { flex:1; }
+    .attr-item input, .attr-item textarea { width:100%; border:1.5px solid var(--border); border-radius:8px; padding:8px 12px; font-family:inherit; font-size:.88rem; color:var(--text); outline:none; transition:border-color .2s; background:var(--white); }
+    .attr-item input:focus, .attr-item textarea:focus { border-color:var(--teal); }
+    .provider-block-actions { display:flex; gap:6px; margin-left:auto; }
+
+    /* Graph panel action row */
+    .panel-actions { display:flex; flex-wrap:wrap; gap:6px; padding:14px 0 0; border-top:1px solid var(--border); margin-top:14px; }
+    .panel-edit-form { margin-top:14px; }
+    .panel-field { margin-bottom:10px; }
+    .panel-field label { display:block; font-size:.7rem; font-weight:600; color:var(--muted); margin-bottom:3px; }
+    .panel-field input, .panel-field textarea, .panel-field select { width:100%; border:1.5px solid var(--border); border-radius:8px; padding:7px 10px; font-family:inherit; font-size:.83rem; color:var(--text); outline:none; transition:border-color .2s; background:var(--white); }
+    .panel-field input:focus, .panel-field textarea:focus, .panel-field select:focus { border-color:var(--teal); }
+
+    /* Modal footer */
+    .modal-footer { padding:14px 28px; border-top:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; flex-shrink:0; gap:10px; }
+    .modal-footer-left  { font-size:.78rem; color:var(--muted); }
+    .modal-footer-right { display:flex; gap:8px; }
+  </style>
+</head>
+<body>
+
+<!-- ── HEADER ── -->
+<header>
+  <div class="logo">🌿</div>
+  <span class="header-title">Elevia</span>
+  <div class="header-divider"></div>
+  <span class="header-sub" id="header-sub">Clinic Registry</span>
+  <div class="header-nav">
+    <button class="nav-btn onboard" id="nav-onboard" onclick="goOnboard()">+ Onboard New Clinic</button>
+    <button class="nav-btn back"    id="nav-back"      hidden onclick="goHome()">← Back</button>
+    <button class="nav-btn home"    id="nav-home"      hidden onclick="goHome()">🏠 Dashboard</button>
+    <button class="nav-btn back"    id="nav-dashboard" hidden onclick="goHome()">← Dashboard</button>
+  </div>
+</header>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!-- HOME VIEW                                              -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div class="view active" id="view-home">
+  <div class="home-wrap">
+    <div class="dashboard-header">
+      <div class="dashboard-header-text">
+        <h1>Clinic Dashboard</h1>
+        <p>All onboarded clinics in the Elevia platform</p>
+      </div>
+      <button class="onboard-cta" onclick="goOnboard()">+ Onboard New Clinic</button>
+    </div>
+    <div class="search-bar">
+      <span class="s-icon">🔍</span>
+      <input id="search-input" type="text" placeholder="Search by clinic name, address or website…" oninput="onSearch(this.value)" />
+      <span class="search-count" id="search-count"></span>
+    </div>
+    <div id="clinic-list" class="clinic-grid">
+      <div class="state-msg"><div class="spinner"></div><p>Loading clinics…</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!-- DETAIL VIEW                                            -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div class="view" id="view-detail">
+  <div class="detail-wrap">
+    <div class="detail-header">
+      <div class="detail-avatar">🏥</div>
+      <div>
+        <h1 id="d-name">—</h1>
+        <div class="d-sub" id="d-sub">—</div>
+      </div>
+      <div class="detail-actions">
+        <button class="btn btn-outline" onclick="goHome()">← Back</button>
+        <button class="btn btn-teal"    onclick="goHome()">🏠 Dashboard</button>
+      </div>
+    </div>
+    <div class="dtabs">
+      <button class="dtab active" id="dtab-text"  onclick="showTab('text')">📋 Text View</button>
+      <button class="dtab"        id="dtab-graph" onclick="showTab('graph')">🔮 Graph View</button>
+    </div>
+    <div id="tab-text">
+      <div class="card">
+        <div class="section-header">
+          <div class="section-label">Clinic Information</div>
+          <div class="entity-actions" id="clinic-action-area"></div>
+        </div>
+        <div class="attr-grid" id="d-clinic-attrs"></div>
+        <div id="clinic-edit-toolbar"></div>
+        <hr class="divider"/>
+        <div class="section-header">
+          <div class="section-label">Providers <span id="d-pcount" style="font-size:.75rem;font-weight:400;color:var(--muted);margin-left:6px"></span></div>
+        </div>
+        <div id="d-providers"></div>
+      </div>
+    </div>
+    <div id="tab-graph" style="display:none">
+      <div class="card" style="padding:20px">
+        <div id="graph-wrapper">
+          <div id="graph-container"><svg id="graph-svg"></svg></div>
+          <div id="detail-panel"><p class="dp-empty">👆 Click any node<br/>to inspect its details</p></div>
+        </div>
+        <p class="graph-hint">Drag to rearrange · Scroll to zoom · Click to inspect</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!-- ONBOARD VIEW                                           -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div class="view" id="view-onboard">
+
+  <!-- 5-step indicator -->
+  <div class="steps">
+    <div class="step">
+      <div class="step-dot active" id="dot-1">1</div>
+      <span class="step-label active" id="lbl-1">Enter Website</span>
+    </div>
+    <div class="step-line" id="line-1"></div>
+    <div class="step">
+      <div class="step-dot" id="dot-2">2</div>
+      <span class="step-label" id="lbl-2">AI Extraction</span>
+    </div>
+    <div class="step-line" id="line-2"></div>
+    <div class="step">
+      <div class="step-dot" id="dot-3">3</div>
+      <span class="step-label" id="lbl-3">Patient Intake</span>
+    </div>
+    <div class="step-line" id="line-3"></div>
+    <div class="step">
+      <div class="step-dot" id="dot-4">4</div>
+      <span class="step-label" id="lbl-4">Review &amp; Confirm</span>
+    </div>
+    <div class="step-line" id="line-4"></div>
+    <div class="step">
+      <div class="step-dot" id="dot-5">5</div>
+      <span class="step-label" id="lbl-5">Saved</span>
+    </div>
+  </div>
+
+  <div class="panel-wrap">
+
+    <!-- STEP 1: Enter website -->
+    <div class="panel active" id="panel-1">
+      <div class="ob-card">
+        <h2>Onboard a New Clinic</h2>
+        <p class="sub">Enter the clinic name and website URL. Elevia will crawl the site and extract clinic details and provider profiles automatically using AI.</p>
+        <div class="form-group">
+          <label>Clinic Name</label>
+          <input id="clinic-name" type="text" placeholder="e.g. Orange Psychiatry Associates" />
+        </div>
+        <div class="form-group">
+          <label>Clinic Website URL</label>
+          <input id="clinic-url" type="url" placeholder="https://www.example-clinic.com" />
+          <div class="form-hint">The crawler will visit up to 8 pages to find provider information.</div>
+        </div>
+        <div id="step1-error" class="error-box" style="display:none"></div>
+        <button class="btn btn-primary" id="btn-crawl">🔍 Start AI Extraction</button>
+      </div>
+    </div>
+
+    <!-- STEP 2: Loading -->
+    <div class="panel" id="panel-2">
+      <div class="ob-card loading-card">
+        <div class="spinner-ring"></div>
+        <h2 style="font-size:1.3rem;color:var(--dark)">Extracting clinic data…</h2>
+        <p style="color:var(--muted);font-size:.9rem;margin-top:8px">This usually takes 20–45 seconds.</p>
+        <div class="loading-steps">
+          <div class="lstep done"   id="ls-1"><span class="licon">✓</span> Fetching website pages</div>
+          <div class="lstep active" id="ls-2"><span class="licon">⚙️</span> Analysing content with AI</div>
+          <div class="lstep"        id="ls-3"><span class="licon">📋</span> Structuring clinic &amp; providers</div>
+          <div class="lstep"        id="ls-4"><span class="licon">✅</span> Ready to review</div>
+        </div>
+        <button class="btn btn-outline" style="margin-top:28px" onclick="cancelAndBack()">← Back</button>
+      </div>
+    </div>
+
+    <!-- STEP 3: Patient Intake & Screening -->
+    <div class="panel" id="panel-3">
+      <div class="ob-card">
+        <h2>Patient Intake &amp; Screening Setup</h2>
+        <p class="sub">Help Elevia route the right patients to this clinic. Answer one question at a time — press Skip for anything that doesn't apply.</p>
+
+        <!-- Progress -->
+        <div class="intake-progress-wrap">
+          <div class="intake-progress-bar">
+            <div class="intake-progress-fill" id="intake-progress-fill"></div>
+          </div>
+          <span class="intake-progress-label" id="intake-progress-label">Question 1 of 19</span>
+        </div>
+
+        <!-- Animated question -->
+        <div class="intake-question-card" id="intake-question-card"></div>
+
+        <!-- Nav -->
+        <div class="intake-nav">
+          <button class="btn btn-outline" id="intake-btn-prev" onclick="prevQuestion()" style="visibility:hidden">← Back</button>
+          <button class="btn-skip" id="intake-btn-skip" onclick="skipQuestion()">Skip</button>
+          <button class="btn btn-primary" id="intake-btn-next" onclick="nextQuestion()">Next →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 4: Review & Confirm -->
+    <div class="panel" id="panel-4">
+      <div class="review-tabs">
+        <button class="rtab active" id="rtab-text"  onclick="showReviewTab('text')">📋 Text View</button>
+        <button class="rtab"        id="rtab-graph" onclick="showReviewTab('graph')">🔮 Graph View</button>
+      </div>
+
+      <div id="review-text">
+        <div class="ob-card">
+          <div class="ob-section-label">Clinic Information</div>
+          <div style="margin-bottom:32px"><div class="ob-attr-grid" id="clinic-fields"></div></div>
+          <hr class="ob-divider"/>
+          <div class="ob-section-label">Providers <span id="provider-count" style="font-size:.75rem;color:var(--muted);font-weight:400;margin-left:6px"></span></div>
+          <div id="provider-list"></div>
+          <!-- intake summary injected here by renderIntakeSummary() -->
+        </div>
+      </div>
+
+      <div id="review-graph" style="display:none">
+        <div class="ob-card" style="padding:20px">
+          <div id="ob-graph-wrapper">
+            <div id="ob-graph-container"><svg id="ob-graph-svg"></svg></div>
+            <div id="ob-detail-panel"><p style="color:var(--muted);font-size:.85rem;text-align:center;margin-top:40px">👆 Click any node<br/>to see its details</p></div>
+          </div>
+          <p class="graph-hint">Drag nodes to rearrange · Scroll to zoom · Click to inspect</p>
+        </div>
+      </div>
+
+      <div class="save-bar">
+        <div class="save-info">
+          <strong id="save-summary">Review the data above before saving.</strong><br/>
+          Changes made in the text view will be saved.
+        </div>
+        <div style="display:flex;gap:12px">
+          <button class="btn btn-outline" onclick="goStep(3)">← Back</button>
+          <button class="btn btn-primary" id="btn-save" onclick="saveData()">✓ Confirm &amp; Save to Database</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 5: Saved -->
+    <div class="panel" id="panel-5">
+      <div class="ob-card success-card">
+        <div class="success-icon">🎉</div>
+        <h2>Clinic Onboarded Successfully!</h2>
+        <p>The clinic, provider profiles, and patient intake configuration have been saved to the Elevia Platform database.</p>
+        <div class="success-stats">
+          <div class="sstat"><strong id="stat-providers">—</strong><span>Providers saved</span></div>
+          <div class="sstat"><strong id="stat-clinic">—</strong><span>Clinic ID</span></div>
+        </div>
+        <div style="display:flex;gap:12px;justify-content:center">
+          <button class="btn btn-outline"  onclick="goHome()">← Back to Dashboard</button>
+          <button class="btn btn-primary"  onclick="restart()">+ Onboard Another Clinic</button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /panel-wrap -->
+</div><!-- /view-onboard -->
+
+<!-- ══════════════════════════════════════════════════════ -->
+<script>
+// ══════════════════════════════════════════════════════════
+// SHARED STATE & NAV
+// ══════════════════════════════════════════════════════════
+let currentDetail = null;
+let searchTimer   = null;
+
+function showView(name) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-' + name).classList.add('active');
+  const isHome    = name === 'home';
+  const isDetail  = name === 'detail';
+  const isOnboard = name === 'onboard';
+  document.getElementById('nav-onboard').hidden   = !isHome;
+  document.getElementById('nav-back').hidden      = !isDetail;
+  document.getElementById('nav-home').hidden      = !isDetail;
+  document.getElementById('nav-dashboard').hidden = !isOnboard;
+  document.getElementById('header-sub').textContent =
+    isDetail  ? 'Clinic Detail' :
+    isOnboard ? 'Onboarding Wizard' :
+    'Clinic Registry';
+}
+
+function goHome() {
+  currentDetail = null;
+  loadClinics(document.getElementById('search-input').value.trim());
+  showView('home');
+}
+
+function goOnboard() {
+  restart();
+  showView('onboard');
+}
+
+loadClinics('');
+
+// ══════════════════════════════════════════════════════════
+// ADMIN PORTAL
+// ══════════════════════════════════════════════════════════
+function onSearch(val) {
+  clearTimeout(searchTimer);
+  searchTimer = setTimeout(() => loadClinics(val.trim()), 280);
+}
+
+async function loadClinics(q) {
+  const list = document.getElementById('clinic-list');
+  list.innerHTML = `<div class="state-msg"><div class="spinner"></div><p>Loading…</p></div>`;
+  try {
+    const res     = await fetch('/api/clinics?q=' + encodeURIComponent(q));
+    const clinics = await res.json();
+    renderClinicList(clinics, q);
+  } catch {
+    list.innerHTML = `<div class="state-msg"><div class="icon">⚠️</div><p>Could not load clinics.</p></div>`;
+  }
+}
+
+function renderClinicList(clinics, q) {
+  const list = document.getElementById('clinic-list');
+  document.getElementById('search-count').textContent =
+    clinics.length ? `${clinics.length} clinic${clinics.length > 1 ? 's' : ''}` : '';
+  if (!clinics.length) {
+    list.innerHTML = `<div class="state-msg"><div class="icon">🔍</div>
+      <p>No clinics found${q ? ` matching "${esc(q)}"` : ''}.</p></div>`;
+    return;
+  }
+  list.innerHTML = clinics.map(c => `
+    <div class="clinic-card" onclick="openClinic(${c.id})">
+      <div class="clinic-card-top">
+        <div class="clinic-avatar">🏥</div>
+        <div>
+          <h3>${esc(c.name)}</h3>
+          <div class="c-site">${esc(c.website || '')}</div>
+        </div>
+      </div>
+      <div class="clinic-card-body">
+        <div class="clinic-meta">
+          ${c.address ? `<div class="clinic-meta-row"><span class="mi">📍</span>${esc(c.address)}</div>` : ''}
+          ${c.phone   ? `<div class="clinic-meta-row"><span class="mi">📞</span>${esc(c.phone)}</div>` : ''}
+          ${c.email   ? `<div class="clinic-meta-row"><span class="mi">✉️</span>${esc(c.email)}</div>` : ''}
+        </div>
+        <div class="clinic-footer">
+          <span class="provider-pill">🧑‍⚕️ ${c.provider_count} provider${c.provider_count != 1 ? 's' : ''}</span>
+          <span class="view-btn">View details →</span>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+async function openClinic(id) {
+  showView('detail');
+  document.getElementById('d-name').textContent       = 'Loading…';
+  document.getElementById('d-sub').textContent        = '';
+  document.getElementById('d-clinic-attrs').innerHTML = '<div class="state-msg" style="padding:32px 0"><div class="spinner"></div></div>';
+  document.getElementById('d-providers').innerHTML    = '';
+  showTab('text');
+  try {
+    const res  = await fetch(`/api/clinics/${id}`);
+    const data = await res.json();
+    currentDetail = data;
+    renderDetail(data);
+  } catch {
+    document.getElementById('d-clinic-attrs').innerHTML = '<p style="color:#dc2626">Failed to load clinic details.</p>';
+  }
+}
+
+function renderDetail(data) {
+  const c = data.clinic, ps = data.providers;
+  document.getElementById('d-name').textContent = c.name || '—';
+  document.getElementById('d-sub').textContent  = [c.address, c.phone].filter(Boolean).join(' · ');
+  const attrs = [
+    { label:'Address',      val: c.address },
+    { label:'Phone',        val: c.phone   },
+    { label:'Email',        val: c.email   },
+    { label:'Website',      val: c.website },
+    { label:'MCP Endpoint', val: c.mcp_endpoint },
+    { label:'Onboarded',    val: c.created_at ? new Date(c.created_at).toLocaleDateString() : null },
+  ].filter(a => a.val);
+  let attrsHTML = attrs.map(a =>
+    `<div class="attr-item"><label>${esc(a.label)}</label><div class="val">${esc(a.val)}</div></div>`
+  ).join('');
+  if (c.kb_path) {
+    attrsHTML += `<div class="attr-item">
+      <label>Screening Profile</label>
+      <div class="val">
+        <button class="kb-link" onclick="showIntakeModal(${c.id})">
+          🗂️ View Patient Intake Q&amp;A
+        </button>
+      </div>
+    </div>`;
+  }
+  document.getElementById('d-clinic-attrs').innerHTML = attrsHTML;
+  document.getElementById('clinic-edit-toolbar').innerHTML = '';
+  document.getElementById('clinic-action-area').innerHTML =
+    `<button class="btn-edit" onclick="startEditClinic()">✏️ Edit</button>
+     <button class="btn-danger" onclick="confirmDeleteClinic(${c.id})">🗑️ Delete</button>`;
+  document.getElementById('d-pcount').textContent = `(${ps.length} found)`;
+  document.getElementById('d-providers').innerHTML = ps.length
+    ? ps.map(p => renderProviderBlock(p)).join('')
+    : '<p style="color:var(--muted);font-size:.88rem">No providers on record.</p>';
+}
+
+function renderProviderBlock(p) {
+  const acc   = p.accepting_new_patients === true ? 'yes' : p.accepting_new_patients === false ? 'no' : null;
+  const badge = acc === 'yes' ? '<span class="pb-badge yes">✓ Accepting</span>'
+              : acc === 'no'  ? '<span class="pb-badge no">✗ Not Accepting</span>' : '';
+  const specs = (p.specializations || []).map(s => `<span class="chip">${esc(s)}</span>`).join('');
+  const ins   = (p.insurance || []).slice(0,4).map(i => `<span class="chip ins">${esc(i)}</span>`).join('');
+  return `
+    <div class="provider-block" id="provider-block-${p.id}">
+      <div class="pb-top">
+        <div class="pb-avatar">🧑‍⚕️</div>
+        <div><div class="pb-name">${esc(p.name)}</div></div>
+        ${badge}
+        <div class="provider-block-actions">
+          <button class="btn-edit" onclick="startEditProvider(${p.id})">✏️ Edit</button>
+          <button class="btn-danger" onclick="confirmDeleteProvider(${p.id})">🗑️ Delete</button>
+        </div>
+      </div>
+      <div class="pb-meta">
+        ${p.phone ? `<div class="pb-meta-item"><label>Phone</label><div class="val">${esc(p.phone)}</div></div>` : ''}
+        ${p.mailing_address ? `<div class="pb-meta-item"><label>Address</label><div class="val">${esc(p.mailing_address)}</div></div>` : ''}
+        ${specs ? `<div class="pb-meta-item full"><label>Specializations</label><div class="chip-row">${specs}</div></div>` : ''}
+        ${ins   ? `<div class="pb-meta-item full"><label>Insurance</label><div class="chip-row">${ins}</div></div>` : ''}
+        ${p.description ? `<div class="pb-meta-item full"><label>Bio</label><div class="pb-desc">${esc(p.description)}</div></div>` : ''}
+      </div>
+      <div id="provider-confirm-${p.id}"></div>
+    </div>`;
+}
+
+function showTab(tab) {
+  document.getElementById('tab-text').style.display  = tab === 'text'  ? '' : 'none';
+  document.getElementById('tab-graph').style.display = tab === 'graph' ? '' : 'none';
+  document.getElementById('dtab-text').classList.toggle('active',  tab === 'text');
+  document.getElementById('dtab-graph').classList.toggle('active', tab === 'graph');
+  if (tab === 'graph' && currentDetail) renderDetailGraph(currentDetail);
+}
+
+function renderDetailGraph(data) {
+  const svg = d3.select('#graph-svg');
+  svg.selectAll('*').remove();
+  const container = document.getElementById('graph-container');
+  const W = container.clientWidth, H = container.clientHeight;
+  const defs = svg.append('defs');
+  const gC = defs.append('linearGradient').attr('id','gClinic').attr('x1','0%').attr('y1','0%').attr('x2','100%').attr('y2','100%');
+  gC.append('stop').attr('offset','0%').attr('stop-color','#35dcc2');
+  gC.append('stop').attr('offset','100%').attr('stop-color','#78eaca');
+  const gP = defs.append('linearGradient').attr('id','gProv').attr('x1','0%').attr('y1','0%').attr('x2','100%').attr('y2','100%');
+  gP.append('stop').attr('offset','0%').attr('stop-color','#4f8ef7');
+  gP.append('stop').attr('offset','100%').attr('stop-color','#6ecfb0');
+  const c = data.clinic, ps = data.providers;
+  const nodes = [{ id:'clinic', type:'clinic', data:c }, ...ps.map((p,i) => ({ id:`p${i}`, type:'provider', data:p }))];
+  const links = ps.map((_,i) => ({ source:'clinic', target:`p${i}` }));
+  const zoomG = svg.append('g');
+  svg.call(d3.zoom().scaleExtent([0.25,3]).on('zoom', e => zoomG.attr('transform', e.transform)));
+  const sim = d3.forceSimulation(nodes)
+    .force('link',    d3.forceLink(links).id(d=>d.id).distance(ps.length > 8 ? 130 : 170))
+    .force('charge',  d3.forceManyBody().strength(-400))
+    .force('center',  d3.forceCenter(W/2, H/2))
+    .force('collide', d3.forceCollide(d => d.type==='clinic' ? 65 : 46));
+  const link = zoomG.append('g').selectAll('line').data(links).join('line').attr('stroke','#c8e6e0').attr('stroke-width',2).attr('stroke-dasharray','5 4');
+  const node = zoomG.append('g').selectAll('g').data(nodes).join('g').style('cursor','pointer')
+    .call(d3.drag().on('start',(e,d)=>{ if(!e.active) sim.alphaTarget(0.3).restart(); d.fx=d.x; d.fy=d.y; })
+                   .on('drag', (e,d)=>{ d.fx=e.x; d.fy=e.y; })
+                   .on('end',  (e,d)=>{ if(!e.active) sim.alphaTarget(0); d.fx=null; d.fy=null; }))
+    .on('click',(e,d) => showDetailNodePanel(d));
+  node.append('circle').attr('r', d => d.type==='clinic' ? 50 : 34)
+    .attr('fill', d => d.type==='clinic' ? 'url(#gClinic)' : 'url(#gProv)')
+    .attr('stroke','#fff').attr('stroke-width',3).attr('filter','drop-shadow(0 4px 10px rgba(53,220,194,.3))');
+  node.append('text').attr('text-anchor','middle').attr('fill','#fff').attr('font-family','Inter,sans-serif').attr('font-weight','700').attr('pointer-events','none')
+    .each(function(d) {
+      const el = d3.select(this);
+      if (d.type === 'clinic') {
+        el.attr('font-size','10.5px');
+        const words=(d.data.name||'Clinic').split(' '); let lines=[],cur='';
+        words.forEach(w=>{const t=cur?cur+' '+w:w;if(t.length>13){lines.push(cur);cur=w;}else{cur=t;}});
+        if(cur) lines.push(cur); const off=-(lines.length-1)*7;
+        lines.forEach((ln,li)=>el.append('tspan').attr('x',0).attr('dy',li===0?off:14).text(ln));
+      } else {
+        el.attr('font-size','10px');
+        const last=(d.data.name||'').replace(/^Dr\.?\s*/i,'').split(' ').pop();
+        el.append('tspan').attr('x',0).attr('dy','-5').text('🧑‍⚕️');
+        el.append('tspan').attr('x',0).attr('dy','13').text(last.length>9?last.slice(0,8)+'…':last);
+      }
+    });
+  sim.on('tick',()=>{
+    link.attr('x1',d=>d.source.x).attr('y1',d=>d.source.y).attr('x2',d=>d.target.x).attr('y2',d=>d.target.y);
+    node.attr('transform',d=>`translate(${d.x},${d.y})`);
+  });
+}
+
+let currentPanelNode = null;
+
+function showDetailNodePanel(d) {
+  currentPanelNode = d;
+  const panel = document.getElementById('detail-panel');
+  const data = d.data, isClinic = d.type === 'clinic';
+  const chips = arr => (arr||[]).map(s=>`<span class="dp-chip">${esc(s)}</span>`).join('');
+  const row   = (label, val) => val ? `<div class="dp-row"><span class="dp-label">${label}</span><div class="dp-val">${esc(String(val))}</div></div>` : '';
+  let html = `<div class="dp-title">${esc(data.name||'—')}</div><div class="dp-type">${isClinic ? '🏥 Clinic' : '🧑‍⚕️ Provider'}</div>`;
+  if (isClinic) {
+    html += row('Address', data.address); html += row('Phone', data.phone);
+    html += row('Email', data.email);     html += row('Website', data.website);
+    if (data.kb_path) {
+      html += `<div class="dp-row"><span class="dp-label">Screening Profile</span>
+        <div class="dp-val"><button class="kb-link" onclick="showIntakeModal(${data.id})">🗂️ View Patient Intake Q&amp;A</button></div>
+      </div>`;
+    }
+    html += `<div class="panel-actions">
+      <button class="btn-edit" onclick="panelRename('clinic',${data.id})">✏️ Rename</button>
+      <button class="btn-edit" onclick="panelEditForm('clinic',${data.id})">📝 Update</button>
+      <button class="btn-danger" onclick="panelConfirmDelete('clinic',${data.id})">🗑️ Delete</button>
+    </div>`;
+  } else {
+    html += row('Phone', data.phone);
+    const acc = data.accepting_new_patients === true ? '✓ Accepting new patients' : data.accepting_new_patients === false ? '✗ Not accepting' : null;
+    html += row('Status', acc); html += row('Rating', data.rating || data.reviews);
+    if ((data.specializations||[]).length) html += `<div class="dp-row"><span class="dp-label">Specializations</span><div>${chips(data.specializations)}</div></div>`;
+    if ((data.insurance||[]).length) html += `<div class="dp-row"><span class="dp-label">Insurance</span><div>${chips(data.insurance.slice(0,5))}</div></div>`;
+    if (data.description) html += `<div class="dp-row"><span class="dp-label">Bio</span><div class="dp-val" style="font-style:italic">${esc(data.description)}</div></div>`;
+    html += `<div class="panel-actions">
+      <button class="btn-edit" onclick="panelRename('provider',${data.id})">✏️ Rename</button>
+      <button class="btn-edit" onclick="panelEditForm('provider',${data.id})">📝 Update</button>
+      <button class="btn-danger" onclick="panelConfirmDelete('provider',${data.id})">🗑️ Delete</button>
+    </div>`;
+  }
+  panel.innerHTML = html;
+}
+
+// ══════════════════════════════════════════════════════════
+// ONBOARDER — Wizard state
+// ══════════════════════════════════════════════════════════
+let extracted        = null;
+let crawlAbort       = null;
+let intakeData       = {};
+let intakeIdx        = 0;
+let autoAdvanceTimer = null;
+
+// ══════════════════════════════════════════════════════════
+// INTAKE QUESTIONS (19 total)
+// ══════════════════════════════════════════════════════════
+const INTAKE_QUESTIONS = [
+  { id:'telehealth', section:'Practice Info', type:'yn',
+    question:'Does this clinic offer telehealth appointments?',
+    hint:'Select Yes if any provider sees patients via video or phone.' },
+
+  { id:'states_licensed', section:'Practice Info', type:'chips', optional:true,
+    question:'Which U.S. states is the clinic licensed to serve patients in?',
+    hint:'Auto-detected from the clinic address. Add any additional states, or skip — this is optional.',
+    options:['AL','AK','AZ','AR','CA','CO','CT','DE','FL','GA','HI','ID','IL','IN','IA','KS','KY',
+             'LA','ME','MD','MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ','NM','NY','NC','ND',
+             'OH','OK','OR','PA','RI','SC','SD','TN','TX','UT','VT','VA','WA','WV','WI','WY','DC'] },
+
+  { id:'languages', section:'Provider Details', type:'chips',
+    question:'What languages do providers at this clinic speak?',
+    hint:'Patients can filter by language preference.',
+    options:['English','Spanish','Mandarin','Cantonese','Vietnamese','Korean','Tagalog',
+             'Arabic','French','Portuguese','Hindi','Russian','Japanese','Farsi','Polish'],
+    other:true, otherLabel:'Add another language…' },
+
+  { id:'specializations', section:'Specializations', type:'chips',
+    question:'What mental health conditions does this clinic specialise in treating?',
+    hint:'Pre-filled from AI extraction — adjust as needed.',
+    options:['Anxiety','Depression','ADHD','Bipolar Disorder','PTSD','OCD','Eating Disorders',
+             'Schizophrenia','Substance Use','Autism Spectrum','Personality Disorders',
+             'Grief & Loss','Trauma','Relationship Issues','Stress Management','Insomnia','Phobias'],
+    other:true, otherLabel:'Add a specialization…', prefillFrom:'clinic.specialties' },
+
+  { id:'age_groups', section:'Patient Criteria', type:'chips',
+    question:'Which age groups does this clinic serve?',
+    hint:'Patients outside these age ranges will not be matched.',
+    options:['Children (0–12)','Adolescents (13–17)','Young Adults (18–25)','Adults (26–64)','Older Adults (65+)'] },
+
+  { id:'severity_levels', section:'Patient Criteria', type:'chips',
+    question:'What severity levels does this clinic typically accept?',
+    hint:'This helps match patients with appropriate care needs.',
+    options:['Mild (outpatient / therapy only)','Moderate (therapy + medication management)',
+             'Severe (intensive outpatient)','Crisis / acute stabilization'] },
+
+  { id:'exclusions', section:'Patient Criteria', type:'chips',
+    question:'Are there patient populations this clinic does NOT serve?',
+    hint:'Leave blank if there are no exclusions — these will filter out routing.',
+    options:['Active psychosis','Active substance use requiring detox','Court-mandated patients only',
+             'Severe personality disorders','Minors under 12','Adults over 65'],
+    other:true, otherLabel:'Describe another exclusion…' },
+
+  { id:'screening_tools', section:'Screening', type:'chips',
+    question:'Which standardised screening tools does this clinic use?',
+    hint:'Select all tools used for initial patient assessment.',
+    options:['PHQ-9 (Depression)','GAD-7 (Anxiety)','PCL-5 (PTSD)','AUDIT (Alcohol)',
+             'DAST-10 (Drug Use)','Columbia Suicide Severity (C-SSRS)','ASRS (ADHD)',
+             'MDQ (Bipolar)','ACE Questionnaire'],
+    other:true, otherLabel:'Name another tool…' },
+
+  { id:'si_handling', section:'Risk Rules', type:'radio',
+    question:'How does this clinic handle active suicidal ideation at intake?',
+    hint:'This determines whether high-risk patients are routed here.',
+    options:[
+      { value:'accept',  label:'Clinic can accept and manage active SI' },
+      { value:'refer',   label:'Clinic refers active SI patients to crisis services' },
+      { value:'screen',  label:'Depends on severity — clinic screens and decides' },
+      { value:'na',      label:'Not applicable / clinic does not screen for SI' },
+    ]},
+
+  { id:'emergency_protocol', section:'Risk Rules', type:'yn',
+    question:'Does this clinic have a documented emergency / crisis protocol?',
+    hint:'E.g. a written procedure for safety planning or warm hand-offs to higher levels of care.' },
+
+  { id:'red_flags', section:'Risk Rules', type:'chips',
+    question:'Which patient red flags should automatically exclude this clinic from matching?',
+    hint:'Patients with any selected flags will not be routed to this clinic.',
+    options:['Active homicidal ideation','Recent inpatient hospitalization (< 30 days)',
+             'Active substance abuse requiring detox','No insurance / cannot self-pay',
+             'Requires medication management but clinic is therapy-only'],
+    other:true, otherLabel:'Add a red flag…' },
+
+  { id:'modalities', section:'Treatment', type:'chips',
+    question:'What treatment modalities do providers at this clinic use?',
+    hint:'Patients can filter by preferred therapeutic approach.',
+    options:['CBT','DBT','EMDR','Psychodynamic','ACT','Motivational Interviewing',
+             'Family Therapy','Group Therapy','Medication Management',
+             'Mindfulness-Based','Somatic','Play Therapy','Art Therapy','Exposure Therapy (ERP)'],
+    other:true, otherLabel:'Add a modality…' },
+
+  { id:'wait_time_days', section:'Appointments', type:'number',
+    question:'What is the typical new-patient wait time (in days)?',
+    hint:'Enter 0 if the clinic can usually see new patients within 24 hours.',
+    placeholder:'e.g. 14', unit:'days' },
+
+  { id:'session_types', section:'Appointments', type:'chips',
+    question:'What session formats does this clinic offer?',
+    hint:'Select all that apply.',
+    options:['In-person only','Telehealth (video)','Telehealth (phone)',
+             'Hybrid (patient choice)','Evening / weekend hours','Same-day crisis slots'] },
+
+  { id:'matching_criteria', section:'Appointments', type:'chips',
+    question:'Which additional patient criteria does this clinic prioritise when matching?',
+    hint:'These will rank this clinic higher for matching patients with specific needs.',
+    options:['Gender of provider matters','Cultural competency required',
+             'LGBTQ+ affirming practice','Trauma-informed approach',
+             'Faith-based approach available','Military / veteran experience'],
+    other:true, otherLabel:'Add a criterion…' },
+
+  { id:'insurance_plans', section:'Insurance', type:'chips',
+    question:'Which insurance plans does this clinic accept?',
+    hint:'Pre-filled from AI extraction — adjust as needed.',
+    options:['Aetna','Anthem / BCBS','Cigna','Humana','Kaiser','Magellan','MHN','Molina',
+             'Oscar','United Healthcare','Tricare','Medicaid','Medicare','CHIP'],
+    other:true, otherLabel:'Add an insurance plan…', prefillFrom:'providers[0].insurance' },
+
+  { id:'self_pay', section:'Insurance', type:'yn',
+    question:'Does this clinic accept self-pay (out-of-pocket) patients?',
+    hint:'Patients without insurance will only be matched to clinics that accept self-pay.' },
+
+  { id:'sliding_scale', section:'Insurance', type:'yn',
+    question:'Is a sliding-scale fee structure available?',
+    hint:'Selecting Yes increases matching priority for patients who cannot afford full rate.' },
+
+  { id:'intake_notes', section:'Additional Notes', type:'textarea',
+    question:'Any additional intake requirements or notes for the Elevia matching team?',
+    hint:'Optional. E.g. "Referral required", "Spanish-speaking therapist Mon–Wed", etc.',
+    placeholder:'Free-text notes…' },
+];
+
+// ══════════════════════════════════════════════════════════
+// INTAKE LOGIC
+// ══════════════════════════════════════════════════════════
+function startIntake() {
+  intakeIdx = 0;
+  // Pre-populate from extracted data
+  INTAKE_QUESTIONS.forEach(q => {
+    if (q.prefillFrom && !(q.id in intakeData)) {
+      const val = getNestedVal(extracted, q.prefillFrom);
+      if (val) intakeData[q.id] = Array.isArray(val) ? [...val] : val;
+    }
+  });
+  // Auto-detect state from clinic address (e.g. "Stamford, CT 06905" → "CT")
+  if (!intakeData.states_licensed || !intakeData.states_licensed.length) {
+    const addr = extracted?.clinic?.address || '';
+    const m = addr.match(/\b([A-Z]{2})\s+\d{5}/);
+    if (m) intakeData.states_licensed = [m[1]];
+  }
+  renderIntakeQuestion(0);
+}
+
+function getNestedVal(obj, path) {
+  try {
+    return path.replace(/\[(\d+)\]/g, '.$1').split('.').reduce((o, k) => o?.[k], obj);
+  } catch { return undefined; }
+}
+
+function renderIntakeQuestion(idx) {
+  const q     = INTAKE_QUESTIONS[idx];
+  const total = INTAKE_QUESTIONS.length;
+  const ans   = intakeData[q.id];
+
+  // Progress
+  const pct = Math.round((idx / total) * 100);
+  document.getElementById('intake-progress-fill').style.width  = pct + '%';
+  document.getElementById('intake-progress-label').textContent = `Question ${idx + 1} of ${total}`;
+
+  // Nav buttons
+  document.getElementById('intake-btn-prev').style.visibility = idx > 0 ? 'visible' : 'hidden';
+  document.getElementById('intake-btn-next').textContent = idx === total - 1 ? 'Finish →' : 'Next →';
+
+  // Build input HTML
+  let inputHTML = '';
+
+  if (q.type === 'yn') {
+    const ysel = ans === true  ? ' selected' : '';
+    const nsel = ans === false ? ' selected' : '';
+    inputHTML = `<div class="yn-row">
+      <button class="yn-btn${ysel}"       onclick="intakeSelectYN('${q.id}',true)">✓ &nbsp;Yes</button>
+      <button class="yn-btn yn-no${nsel}" onclick="intakeSelectYN('${q.id}',false)">✗ &nbsp;No</button>
+    </div>`;
+
+  } else if (q.type === 'chips') {
+    const selected = Array.isArray(ans) ? ans : [];
+    const chips = q.options.map(opt => {
+      const sel = selected.includes(opt) ? ' selected' : '';
+      return `<button class="chip-sel${sel}" onclick="intakeToggleChip('${q.id}','${esc(opt)}')">${esc(opt)}</button>`;
+    }).join('');
+    const customVals  = selected.filter(v => !q.options.includes(v));
+    const showOther   = customVals.length > 0;
+    const otherSel    = showOther ? ' selected' : '';
+    const otherInput  = q.other ? `
+      <button class="chip-sel${otherSel}" id="chip-other-toggle-${q.id}"
+              onclick="intakeToggleOtherChip('${q.id}')">${esc(q.otherLabel || 'Other…')}</button>
+      <input class="chip-other-input${showOther ? ' visible' : ''}" id="chip-other-input-${q.id}"
+             type="text" placeholder="${esc(q.otherLabel || 'Enter custom value…')}"
+             value="${esc(customVals.join(', '))}"
+             onblur="intakeSaveOtherChip('${q.id}')"
+             onkeydown="if(event.key==='Enter')intakeSaveOtherChip('${q.id}')"/>` : '';
+    inputHTML = `<div class="chip-select-wrap">${chips}${otherInput}</div>`;
+
+  } else if (q.type === 'radio') {
+    const cards = q.options.map(opt => {
+      const sel = ans === opt.value ? ' selected' : '';
+      return `<label class="radio-card${sel}" onclick="intakeSelectRadio('${q.id}','${esc(opt.value)}')">
+        <input type="radio" name="iq-r-${q.id}" value="${esc(opt.value)}"${ans === opt.value ? ' checked' : ''}/>
+        <span class="radio-card-label">${esc(opt.label)}</span>
+      </label>`;
+    }).join('');
+    inputHTML = `<div class="radio-cards">${cards}</div>`;
+
+  } else if (q.type === 'number') {
+    const val = ans !== undefined ? ans : '';
+    inputHTML = `<div class="iq-input-row">
+      <input class="iq-input" type="number" min="0" style="max-width:180px"
+             id="iq-num-${q.id}" value="${esc(String(val))}" placeholder="${esc(q.placeholder||'')}"/>
+      ${q.unit ? `<span class="iq-unit">${esc(q.unit)}</span>` : ''}
+    </div>`;
+
+  } else if (q.type === 'textarea') {
+    const val = ans !== undefined ? String(ans) : '';
+    inputHTML = `<textarea class="iq-input" rows="4" id="iq-text-${q.id}"
+                           placeholder="${esc(q.placeholder||'')}">${esc(val)}</textarea>`;
+  }
+
+  // Render with animation
+  const card = document.getElementById('intake-question-card');
+  card.classList.remove('iq-animate');
+  card.innerHTML = `
+    <span class="iq-section">${esc(q.section)}</span>
+    <div class="iq-question">${esc(q.question)}</div>
+    ${q.hint ? `<div class="iq-hint">${esc(q.hint)}</div>` : ''}
+    ${inputHTML}`;
+  void card.offsetWidth;
+  card.classList.add('iq-animate');
+}
+
+// Input handlers
+function intakeSelectYN(qid, val) {
+  intakeData[qid] = val;
+  renderIntakeQuestion(intakeIdx);
+  // Auto-advance after a brief pause so the selection is visible
+  clearTimeout(autoAdvanceTimer);
+  autoAdvanceTimer = setTimeout(() => nextQuestion(), 480);
+}
+function intakeSelectRadio(qid, val) {
+  intakeData[qid] = val;
+  renderIntakeQuestion(intakeIdx);
+  // Auto-advance after a brief pause so the selection is visible
+  clearTimeout(autoAdvanceTimer);
+  autoAdvanceTimer = setTimeout(() => nextQuestion(), 480);
+}
+function intakeToggleChip(qid, val) {
+  if (!Array.isArray(intakeData[qid])) intakeData[qid] = [];
+  const arr = intakeData[qid], i = arr.indexOf(val);
+  if (i === -1) arr.push(val); else arr.splice(i, 1);
+  renderIntakeQuestion(intakeIdx);
+}
+function intakeToggleOtherChip(qid) {
+  const input  = document.getElementById('chip-other-input-' + qid);
+  const toggle = document.getElementById('chip-other-toggle-' + qid);
+  if (!input) return;
+  if (input.classList.contains('visible')) {
+    const q = INTAKE_QUESTIONS.find(x => x.id === qid);
+    intakeData[qid] = (intakeData[qid] || []).filter(v => (q ? q.options : []).includes(v));
+    input.classList.remove('visible');
+    if (toggle) toggle.classList.remove('selected');
+  } else {
+    input.classList.add('visible');
+    if (toggle) toggle.classList.add('selected');
+    input.focus();
+  }
+}
+function intakeSaveOtherChip(qid) {
+  const input = document.getElementById('chip-other-input-' + qid);
+  if (!input) return;
+  const q = INTAKE_QUESTIONS.find(x => x.id === qid);
+  const stdOpts = q ? q.options : [];
+  intakeData[qid] = (intakeData[qid] || []).filter(v => stdOpts.includes(v));
+  const raw = input.value.trim();
+  if (raw) raw.split(',').map(s => s.trim()).filter(Boolean).forEach(v => {
+    if (!intakeData[qid].includes(v)) intakeData[qid].push(v);
+  });
+}
+
+// Flush text/number DOM value into intakeData
+function flushCurrentInput() {
+  const q = INTAKE_QUESTIONS[intakeIdx];
+  if (q.type === 'number') {
+    const el = document.getElementById('iq-num-' + q.id);
+    if (el && el.value.trim() !== '') intakeData[q.id] = Number(el.value.trim());
+  } else if (q.type === 'textarea') {
+    const el = document.getElementById('iq-text-' + q.id);
+    if (el && el.value.trim() !== '') intakeData[q.id] = el.value.trim();
+  }
+}
+
+function nextQuestion() {
+  clearTimeout(autoAdvanceTimer);
+  flushCurrentInput();
+  if (intakeIdx < INTAKE_QUESTIONS.length - 1) {
+    intakeIdx++;
+    renderIntakeQuestion(intakeIdx);
+  } else {
+    finishIntake();
+  }
+}
+function prevQuestion() {
+  clearTimeout(autoAdvanceTimer);
+  flushCurrentInput();
+  if (intakeIdx > 0) { intakeIdx--; renderIntakeQuestion(intakeIdx); }
+}
+function skipQuestion() {
+  clearTimeout(autoAdvanceTimer);
+  if (intakeIdx < INTAKE_QUESTIONS.length - 1) {
+    intakeIdx++;
+    renderIntakeQuestion(intakeIdx);
+  } else {
+    finishIntake();
+  }
+}
+
+function finishIntake() {
+  flushCurrentInput();
+  extracted.intake = intakeData;
+  updateSaveSummary();
+  renderIntakeSummary();
+  goStep(4);
+}
+
+function renderIntakeSummary() {
+  const existing = document.getElementById('intake-summary-block');
+  if (existing) existing.remove();
+
+  const container = document.querySelector('#review-text .ob-card');
+  if (!container) return;
+
+  const answered = INTAKE_QUESTIONS.filter(q => intakeData[q.id] !== undefined && intakeData[q.id] !== '');
+  if (!answered.length) return;
+
+  const rows = answered.map(q => {
+    const val = intakeData[q.id];
+    let display = '';
+    if (q.type === 'yn') {
+      display = val === true ? '<span style="color:#065f46;font-weight:700">✓ Yes</span>'
+                             : '<span style="color:#991b1b;font-weight:700">✗ No</span>';
+    } else if (Array.isArray(val) && val.length) {
+      display = val.map(v => `<span class="chip-tag">${esc(v)}</span>`).join(' ');
+    } else if (q.type === 'radio') {
+      const opt = q.options.find(o => o.value === val);
+      display = esc(opt ? opt.label : String(val));
+    } else {
+      display = `<span style="font-style:italic">${esc(String(val))}</span>`;
+    }
+    return `<div class="intake-summary-row">
+      <span class="isr-label">${esc(q.question)}</span>
+      <span class="isr-val">${display}</span>
+    </div>`;
+  }).join('');
+
+  const block = document.createElement('div');
+  block.id = 'intake-summary-block';
+  block.className = 'intake-summary-section';
+  block.innerHTML = `
+    <div class="ob-section-label" style="margin-top:4px">Patient Intake &amp; Screening Profile</div>
+    ${rows}
+    <button class="btn btn-outline" style="margin-top:16px;font-size:.82rem" onclick="goStep(3)">
+      ✏️ Edit Intake Answers
+    </button>`;
+  container.appendChild(block);
+}
+
+// ══════════════════════════════════════════════════════════
+// ONBOARDER — Wizard flow
+// ══════════════════════════════════════════════════════════
+function goStep(n) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-' + n).classList.add('active');
+  for (let i = 1; i <= 5; i++) {
+    document.getElementById('dot-' + i).classList.toggle('done',   i < n);
+    document.getElementById('dot-' + i).classList.toggle('active', i === n);
+    document.getElementById('lbl-' + i).classList.toggle('active', i === n);
+    if (i < 5) document.getElementById('line-' + i).classList.toggle('done', i < n);
+  }
+}
+
+document.getElementById('btn-crawl').addEventListener('click', async () => {
+  const name   = document.getElementById('clinic-name').value.trim();
+  const url    = document.getElementById('clinic-url').value.trim();
+  const errBox = document.getElementById('step1-error');
+  errBox.style.display = 'none';
+  if (!name || !url) {
+    errBox.textContent = 'Please enter both the clinic name and website URL.';
+    errBox.style.display = 'block';
+    return;
+  }
+  goStep(2);
+  crawlAbort = new AbortController();
+
+  const lsIds = ['ls-2','ls-3','ls-4'];
+  let lsIdx = 0;
+  const lsTimer = setInterval(() => {
+    if (lsIdx > 0) {
+      const prev = document.getElementById(lsIds[lsIdx - 1]);
+      prev.classList.remove('active'); prev.classList.add('done');
+      prev.querySelector('.licon').textContent = '✓';
+    }
+    if (lsIdx < lsIds.length) { document.getElementById(lsIds[lsIdx]).classList.add('active'); lsIdx++; }
+    else clearInterval(lsTimer);
+  }, 8000);
+
+  try {
+    const res = await fetch('http://localhost:8002/crawl', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ clinic_name: name, website_url: url }),
+      signal: crawlAbort.signal,
+    });
+    clearInterval(lsTimer);
+    if (!res.ok) {
+      const err = await res.json();
+      goStep(1);
+      document.getElementById('step1-error').textContent   = err.detail || 'Extraction failed.';
+      document.getElementById('step1-error').style.display = 'block';
+      return;
+    }
+    extracted = await res.json();
+    if (extracted.error) {
+      goStep(1);
+      document.getElementById('step1-error').textContent   = extracted.error;
+      document.getElementById('step1-error').style.display = 'block';
+      return;
+    }
+    // Pre-render review (panel-4) content
+    renderTextView();
+    renderOnboardGraph();
+    updateSaveSummary();
+    // Go to intake (step 3)
+    startIntake();
+    goStep(3);
+  } catch (e) {
+    clearInterval(lsTimer);
+    if (e.name === 'AbortError') return;
+    goStep(1);
+    document.getElementById('step1-error').textContent   = 'Network error: ' + e.message;
+    document.getElementById('step1-error').style.display = 'block';
+  }
+});
+
+function renderTextView() {
+  const c = extracted.clinic || {};
+  const clinicFields = document.getElementById('clinic-fields');
+  clinicFields.innerHTML = '';
+  [
+    { key:'name',    label:'Clinic Name', full:false },
+    { key:'address', label:'Address',     full:true  },
+    { key:'phone',   label:'Phone',       full:false },
+    { key:'email',   label:'Email',       full:false },
+    { key:'website', label:'Website',     full:false },
+  ].forEach(f => {
+    const div = document.createElement('div');
+    div.className = 'ob-attr-item' + (f.full ? ' full' : '');
+    div.innerHTML = `<label>${f.label}</label>
+      <input data-field="clinic.${f.key}" value="${esc(c[f.key] || '')}" />`;
+    clinicFields.appendChild(div);
+  });
+  const specsDiv = document.createElement('div');
+  specsDiv.className = 'ob-attr-item full';
+  const specs = c.specialties || [];
+  specsDiv.innerHTML = `<label>Specialties</label>
+    <div class="chips-edit">${specs.map(s=>`<span class="chip-tag">${esc(s)}</span>`).join('')}</div>
+    <input data-field="clinic.specialties" value="${esc(specs.join(', '))}" placeholder="comma-separated" style="margin-top:8px"/>`;
+  clinicFields.appendChild(specsDiv);
+
+  const provList = document.getElementById('provider-list');
+  provList.innerHTML = '';
+  const providers = extracted.providers || [];
+  document.getElementById('provider-count').textContent = `(${providers.length} found)`;
+  providers.forEach((p, i) => {
+    const block = document.createElement('div');
+    block.className = 'ob-provider-block';
+    const acc = p.accepting_new_patients === true ? 'yes' : p.accepting_new_patients === false ? 'no' : null;
+    const accBadge = acc === 'yes' ? '<span class="accepting-badge yes">✓ Accepting</span>'
+                   : acc === 'no'  ? '<span class="accepting-badge no">✗ Not Accepting</span>' : '';
+    block.innerHTML = `
+      <div class="p-name">${esc(p.name || 'Provider')}</div>
+      <div class="p-title">${esc(p.title || '')}</div>
+      ${accBadge}
+      <div class="ob-attr-grid">
+        <div class="ob-attr-item"><label>Years of Practice</label>
+          <input data-field="provider.${i}.years_of_practice" value="${esc(p.years_of_practice || '')}"/></div>
+        <div class="ob-attr-item"><label>Phone</label>
+          <input data-field="provider.${i}.phone" value="${esc(p.phone || '')}"/></div>
+        <div class="ob-attr-item full"><label>Specializations</label>
+          <input data-field="provider.${i}.specializations" value="${esc((p.specializations||[]).join(', '))}"/></div>
+        <div class="ob-attr-item full"><label>Bio / Description</label>
+          <textarea data-field="provider.${i}.description">${esc(p.description || '')}</textarea></div>
+      </div>`;
+    provList.appendChild(block);
+  });
+}
+
+function collectEdits() {
+  document.querySelectorAll('[data-field]').forEach(el => {
+    const path = el.dataset.field.split('.');
+    const val  = el.value.trim();
+    if (path[0] === 'clinic') {
+      if (path[1] === 'specialties') extracted.clinic.specialties = val.split(',').map(s=>s.trim()).filter(Boolean);
+      else extracted.clinic[path[1]] = val;
+    } else if (path[0] === 'provider') {
+      const idx = parseInt(path[1]), field = path[2];
+      if (field === 'specializations') extracted.providers[idx].specializations = val.split(',').map(s=>s.trim()).filter(Boolean);
+      else extracted.providers[idx][field] = val;
+    }
+  });
+}
+
+function updateSaveSummary() {
+  const pCount = (extracted.providers || []).length;
+  document.getElementById('save-summary').textContent =
+    `${esc(extracted.clinic?.name || 'Clinic')} · ${pCount} provider${pCount !== 1 ? 's' : ''} ready to save`;
+}
+
+function renderOnboardGraph() {
+  const svg = d3.select('#ob-graph-svg');
+  svg.selectAll('*').remove();
+  const container = document.getElementById('ob-graph-container');
+  const W = container.clientWidth, H = container.clientHeight;
+  const defs = svg.append('defs');
+  const g1 = defs.append('linearGradient').attr('id','ob-ng').attr('x1','0%').attr('y1','0%').attr('x2','100%').attr('y2','100%');
+  g1.append('stop').attr('offset','0%').attr('stop-color','#35dcc2');
+  g1.append('stop').attr('offset','100%').attr('stop-color','#78eaca');
+  const g2 = defs.append('linearGradient').attr('id','ob-pg').attr('x1','0%').attr('y1','0%').attr('x2','100%').attr('y2','100%');
+  g2.append('stop').attr('offset','0%').attr('stop-color','#4f8ef7');
+  g2.append('stop').attr('offset','100%').attr('stop-color','#6ecfb0');
+  const c = extracted.clinic || {}, providers = extracted.providers || [];
+  const nodes = [{ id:'clinic', type:'clinic', data:c }, ...providers.map((p,i)=>({ id:`p${i}`, type:'provider', data:p }))];
+  const links = providers.map((_,i)=>({ source:'clinic', target:`p${i}` }));
+  const zoomG = svg.append('g');
+  svg.call(d3.zoom().scaleExtent([0.3,3]).on('zoom', e => zoomG.attr('transform', e.transform)));
+  const sim = d3.forceSimulation(nodes)
+    .force('link',    d3.forceLink(links).id(d=>d.id).distance(providers.length > 8 ? 140 : 180))
+    .force('charge',  d3.forceManyBody().strength(-420))
+    .force('center',  d3.forceCenter(W/2, H/2))
+    .force('collide', d3.forceCollide(d => d.type==='clinic' ? 70 : 48));
+  const link = zoomG.append('g').selectAll('line').data(links).join('line').attr('stroke','#c8e6e0').attr('stroke-width',2).attr('stroke-dasharray','5 4');
+  const node = zoomG.append('g').selectAll('g').data(nodes).join('g').style('cursor','pointer')
+    .call(d3.drag().on('start',(e,d)=>{ if(!e.active) sim.alphaTarget(0.3).restart(); d.fx=d.x; d.fy=d.y; })
+                   .on('drag', (e,d)=>{ d.fx=e.x; d.fy=e.y; })
+                   .on('end',  (e,d)=>{ if(!e.active) sim.alphaTarget(0); d.fx=null; d.fy=null; }))
+    .on('click',(e,d)=>showOnboardDetail(d));
+  node.append('circle').attr('r', d => d.type==='clinic' ? 52 : 36)
+    .attr('fill', d => d.type==='clinic' ? 'url(#ob-ng)' : 'url(#ob-pg)')
+    .attr('stroke','#fff').attr('stroke-width',3).attr('filter','drop-shadow(0 4px 12px rgba(53,220,194,.3))');
+  node.append('text').attr('text-anchor','middle').attr('dy','0.35em').attr('fill','#fff')
+    .attr('font-family','Inter,sans-serif').attr('font-weight','700').attr('pointer-events','none')
+    .each(function(d) {
+      const el = d3.select(this);
+      if (d.type === 'clinic') {
+        el.attr('font-size','11px');
+        const words=(d.data.name||'Clinic').split(' '); const lines=[]; let cur='';
+        words.forEach(w=>{const t=cur?cur+' '+w:w;if(t.length>12){lines.push(cur);cur=w;}else{cur=t;}});
+        if(cur) lines.push(cur); const off=-(lines.length-1)*7;
+        lines.forEach((ln,li)=>el.append('tspan').attr('x',0).attr('dy',li===0?off:14).text(ln));
+      } else {
+        el.attr('font-size','10px');
+        const parts=(d.data.name||'Provider').replace(/^Dr\.?\s*/i,'').split(' ');
+        const last=parts[parts.length-1];
+        el.append('tspan').attr('x',0).attr('dy','-6').text('🧑‍⚕️');
+        el.append('tspan').attr('x',0).attr('dy','14').text(last.length>10?last.slice(0,9)+'…':last);
+      }
+    });
+  sim.on('tick',()=>{
+    link.attr('x1',d=>d.source.x).attr('y1',d=>d.source.y).attr('x2',d=>d.target.x).attr('y2',d=>d.target.y);
+    node.attr('transform',d=>`translate(${d.x},${d.y})`);
+  });
+}
+
+function showOnboardDetail(d) {
+  const panel = document.getElementById('ob-detail-panel');
+  const data = d.data, isClinic = d.type === 'clinic';
+  const chips = arr => (arr||[]).map(s=>`<span class="dp-chip">${esc(s)}</span>`).join('');
+  const row   = (label, val) => val ? `<div class="dp-row"><span class="dp-label">${label}</span><span class="dp-val">${esc(String(val))}</span></div>` : '';
+  let html = `<div class="dp-title">${esc(data.name||'—')}</div><div class="dp-type">${isClinic ? '🏥 Clinic' : '🧑‍⚕️ Provider'}</div>`;
+  if (isClinic) {
+    html += row('Address', data.address); html += row('Phone', data.phone);
+    html += row('Email', data.email);     html += row('Website', data.website);
+    if ((data.specialties||[]).length) html += `<div class="dp-row"><span class="dp-label">Specialties</span><div>${chips(data.specialties)}</div></div>`;
+  } else {
+    html += row('Title', data.title); html += row('Phone', data.phone);
+    const acc = data.accepting_new_patients === true ? '✓ Accepting' : data.accepting_new_patients === false ? '✗ Not Accepting' : 'Unknown';
+    html += row('New Patients', acc);
+    if ((data.specializations||[]).length) html += `<div class="dp-row"><span class="dp-label">Specializations</span><div>${chips(data.specializations)}</div></div>`;
+    if (data.description) html += `<div class="dp-row"><span class="dp-label">Bio</span><div class="dp-val">${esc(data.description)}</div></div>`;
+  }
+  panel.innerHTML = html;
+}
+
+function showReviewTab(tab) {
+  document.getElementById('review-text').style.display  = tab === 'text'  ? '' : 'none';
+  document.getElementById('review-graph').style.display = tab === 'graph' ? '' : 'none';
+  document.getElementById('rtab-text').classList.toggle('active',  tab === 'text');
+  document.getElementById('rtab-graph').classList.toggle('active', tab === 'graph');
+  if (tab === 'graph') renderOnboardGraph();
+}
+
+async function saveData() {
+  collectEdits();
+  const btn = document.getElementById('btn-save');
+  btn.disabled = true; btn.textContent = '⏳ Saving…';
+  try {
+    const res = await fetch('http://localhost:8002/save', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ clinic: extracted.clinic, providers: extracted.providers, intake: extracted.intake || {} }),
+    });
+    const result = await res.json();
+    if (!res.ok) {
+      alert('Save failed: ' + (result.detail || JSON.stringify(result)));
+      btn.disabled = false; btn.textContent = '✓ Confirm & Save to Database';
+      return;
+    }
+    document.getElementById('stat-providers').textContent = result.providers_saved;
+    document.getElementById('stat-clinic').textContent    = '#' + result.clinic_id;
+    goStep(5);
+  } catch (e) {
+    alert('Network error: ' + e.message);
+    btn.disabled = false; btn.textContent = '✓ Confirm & Save to Database';
+  }
+}
+
+function cancelAndBack() {
+  if (crawlAbort) { crawlAbort.abort(); crawlAbort = null; }
+  goStep(1);
+}
+
+function restart() {
+  extracted  = null;
+  intakeData = {};
+  intakeIdx  = 0;
+  const nameEl = document.getElementById('clinic-name');
+  const urlEl  = document.getElementById('clinic-url');
+  if (nameEl) nameEl.value = '';
+  if (urlEl)  urlEl.value  = '';
+  const cfEl = document.getElementById('clinic-fields'), plEl = document.getElementById('provider-list');
+  if (cfEl) cfEl.innerHTML = '';
+  if (plEl) plEl.innerHTML = '';
+  const existing = document.getElementById('intake-summary-block');
+  if (existing) existing.remove();
+  const errEl = document.getElementById('step1-error');
+  if (errEl) errEl.style.display = 'none';
+  const saveBtn = document.getElementById('btn-save');
+  if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = '✓ Confirm & Save to Database'; }
+  [['ls-2','⚙️'],['ls-3','📋'],['ls-4','✅']].forEach(([id, icon]) => {
+    const el = document.getElementById(id);
+    if (el) { el.classList.remove('done','active'); el.querySelector('.licon').textContent = icon; }
+  });
+  showReviewTab('text');
+  goStep(1);
+}
+
+// ══════════════════════════════════════════════════════════
+// TEXT VIEW — CLINIC EDIT
+// ══════════════════════════════════════════════════════════
+function startEditClinic() {
+  const c = currentDetail.clinic;
+  const fields = [
+    { key:'name',    label:'Clinic Name', full:false },
+    { key:'address', label:'Address',     full:true  },
+    { key:'phone',   label:'Phone',       full:false },
+    { key:'email',   label:'Email',       full:false },
+    { key:'website', label:'Website',     full:false },
+  ];
+  document.getElementById('d-clinic-attrs').innerHTML = fields.map(f => `
+    <div class="attr-item${f.full ? ' full' : ''}">
+      <label>${f.label}</label>
+      <input data-cfield="${f.key}" value="${esc(c[f.key] || '')}" />
+    </div>`).join('');
+  document.getElementById('clinic-action-area').innerHTML = '';
+  document.getElementById('clinic-edit-toolbar').innerHTML = `
+    <div class="edit-toolbar">
+      <button class="btn-save"   onclick="saveClinicEdits(${c.id})">✓ Save Changes</button>
+      <button class="btn-cancel" onclick="renderDetail(currentDetail)">✕ Cancel</button>
+    </div>`;
+}
+
+async function saveClinicEdits(clinicId) {
+  const fields = {};
+  document.querySelectorAll('[data-cfield]').forEach(el => { fields[el.dataset.cfield] = el.value.trim(); });
+  const btn = document.querySelector('#clinic-edit-toolbar .btn-save');
+  btn.disabled = true; btn.textContent = '⏳ Saving…';
+  try {
+    const res = await fetch(`/api/clinics/${clinicId}`, {
+      method:'PATCH', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ fields }),
+    });
+    if (!res.ok) throw new Error((await res.json()).detail || 'Save failed');
+    // Merge edits into currentDetail and re-render
+    Object.assign(currentDetail.clinic, fields);
+    document.getElementById('d-name').textContent = currentDetail.clinic.name || '—';
+    document.getElementById('d-sub').textContent  = [currentDetail.clinic.address, currentDetail.clinic.phone].filter(Boolean).join(' · ');
+    renderDetail(currentDetail);
+  } catch (e) {
+    btn.disabled = false; btn.textContent = '✓ Save Changes';
+    alert('Error: ' + e.message);
+  }
+}
+
+function confirmDeleteClinic(clinicId) {
+  const toolbar = document.getElementById('clinic-edit-toolbar');
+  toolbar.innerHTML = `
+    <div class="confirm-row">
+      <span>⚠️ Permanently delete this clinic and all its providers?</span>
+      <button class="btn-danger" onclick="executeDeleteClinic(${clinicId})">Yes, Delete</button>
+      <button class="btn-cancel" onclick="renderDetail(currentDetail)">Cancel</button>
+    </div>`;
+}
+
+async function executeDeleteClinic(clinicId) {
+  try {
+    const res = await fetch(`/api/clinics/${clinicId}`, { method:'DELETE' });
+    if (!res.ok) throw new Error((await res.json()).detail || 'Delete failed');
+    goHome();
+  } catch (e) { alert('Error: ' + e.message); }
+}
+
+// ══════════════════════════════════════════════════════════
+// TEXT VIEW — PROVIDER EDIT / DELETE
+// ══════════════════════════════════════════════════════════
+function startEditProvider(pid) {
+  const p = currentDetail.providers.find(x => x.id === pid);
+  if (!p) return;
+  const accVal = p.accepting_new_patients === true ? 'true' : p.accepting_new_patients === false ? 'false' : '';
+  document.getElementById(`provider-block-${pid}`).innerHTML = `
+    <div class="pb-top">
+      <div class="pb-avatar">🧑‍⚕️</div>
+      <div><div class="pb-name">${esc(p.name)}</div></div>
+    </div>
+    <div class="pb-meta">
+      <div class="pb-meta-item"><label>Name</label>
+        <input data-pfield="name" value="${esc(p.name || '')}" /></div>
+      <div class="pb-meta-item"><label>Phone</label>
+        <input data-pfield="phone" value="${esc(p.phone || '')}" /></div>
+      <div class="pb-meta-item full"><label>Specializations (comma-separated)</label>
+        <input data-pfield="specializations" value="${esc((p.specializations||[]).join(', '))}" /></div>
+      <div class="pb-meta-item full"><label>Bio / Description</label>
+        <textarea data-pfield="description" rows="3">${esc(p.description || '')}</textarea></div>
+      <div class="pb-meta-item"><label>Accepting New Patients</label>
+        <select data-pfield="accepting_new_patients">
+          <option value="">Unknown</option>
+          <option value="true"  ${accVal==='true'  ? 'selected':''}>Yes — Accepting</option>
+          <option value="false" ${accVal==='false' ? 'selected':''}>No — Not Accepting</option>
+        </select></div>
+    </div>
+    <div class="edit-toolbar">
+      <button class="btn-save"   onclick="saveProviderEdits(${pid})">✓ Save</button>
+      <button class="btn-cancel" onclick="renderDetail(currentDetail)">✕ Cancel</button>
+      <button class="btn-danger" style="margin-left:auto" onclick="confirmDeleteProvider(${pid})">🗑️ Delete</button>
+    </div>`;
+}
+
+async function saveProviderEdits(pid) {
+  const fields = {};
+  document.querySelectorAll(`#provider-block-${pid} [data-pfield]`).forEach(el => {
+    fields[el.dataset.pfield] = el.value.trim();
+  });
+  const btn = document.querySelector(`#provider-block-${pid} .btn-save`);
+  btn.disabled = true; btn.textContent = '⏳ Saving…';
+  try {
+    const res = await fetch(`/api/providers/${pid}`, {
+      method:'PATCH', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ fields }),
+    });
+    if (!res.ok) throw new Error((await res.json()).detail || 'Save failed');
+    // Update in-memory and re-render
+    const p = currentDetail.providers.find(x => x.id === pid);
+    if (p) {
+      if (fields.name)            p.name = fields.name;
+      if (fields.phone !== undefined) p.phone = fields.phone;
+      if (fields.specializations !== undefined)
+        p.specializations = fields.specializations.split(',').map(s=>s.trim()).filter(Boolean);
+      if (fields.description !== undefined) p.description = fields.description;
+      if (fields.accepting_new_patients !== undefined)
+        p.accepting_new_patients = fields.accepting_new_patients === 'true' ? true
+                                 : fields.accepting_new_patients === 'false' ? false : null;
+    }
+    renderDetail(currentDetail);
+  } catch (e) {
+    btn.disabled = false; btn.textContent = '✓ Save';
+    alert('Error: ' + e.message);
+  }
+}
+
+function confirmDeleteProvider(pid) {
+  const confirmDiv = document.getElementById(`provider-confirm-${pid}`);
+  if (!confirmDiv) return;
+  confirmDiv.innerHTML = `
+    <div class="confirm-row">
+      <span>⚠️ Delete this provider permanently?</span>
+      <button class="btn-danger" onclick="executeDeleteProvider(${pid})">Yes, Delete</button>
+      <button class="btn-cancel" onclick="renderDetail(currentDetail)">Cancel</button>
+    </div>`;
+}
+
+async function executeDeleteProvider(pid) {
+  try {
+    const res = await fetch(`/api/providers/${pid}`, { method:'DELETE' });
+    if (!res.ok) throw new Error((await res.json()).detail || 'Delete failed');
+    currentDetail.providers = currentDetail.providers.filter(x => x.id !== pid);
+    renderDetail(currentDetail);
+  } catch (e) { alert('Error: ' + e.message); }
+}
+
+// ══════════════════════════════════════════════════════════
+// GRAPH PANEL — RENAME / UPDATE / DELETE
+// ══════════════════════════════════════════════════════════
+function panelRename(type, id) {
+  const panel = document.getElementById('detail-panel');
+  const titleEl = panel.querySelector('.dp-title');
+  const currentName = titleEl ? titleEl.textContent : '';
+  titleEl.outerHTML = `<input id="panel-rename-input" class="panel-field" value="${esc(currentName)}"
+    style="font-size:.95rem;font-weight:800;width:100%;border:1.5px solid var(--teal);border-radius:8px;padding:6px 10px;font-family:inherit;outline:none;" />`;
+  const actionsEl = panel.querySelector('.panel-actions');
+  if (actionsEl) actionsEl.innerHTML = `
+    <button class="btn-save"   onclick="savePanelRename('${type}',${id})">✓ Save</button>
+    <button class="btn-cancel" onclick="showDetailNodePanel(currentPanelNode)">✕ Cancel</button>`;
+  document.getElementById('panel-rename-input').focus();
+}
+
+async function savePanelRename(type, id) {
+  const input = document.getElementById('panel-rename-input');
+  const name  = input ? input.value.trim() : '';
+  if (!name) return;
+  try {
+    const url    = type === 'clinic' ? `/api/clinics/${id}` : `/api/providers/${id}`;
+    const res    = await fetch(url, { method:'PATCH', headers:{'Content-Type':'application/json'}, body: JSON.stringify({fields:{name}}) });
+    if (!res.ok) throw new Error((await res.json()).detail || 'Save failed');
+    // Update currentDetail
+    if (type === 'clinic') {
+      currentDetail.clinic.name = name;
+      document.getElementById('d-name').textContent = name;
+    } else {
+      const p = currentDetail.providers.find(x => x.id === id);
+      if (p) p.name = name;
+    }
+    if (currentPanelNode) { currentPanelNode.data.name = name; showDetailNodePanel(currentPanelNode); }
+  } catch (e) { alert('Error: ' + e.message); }
+}
+
+function panelEditForm(type, id) {
+  const panel = document.getElementById('detail-panel');
+  let formHTML = '';
+  if (type === 'clinic') {
+    const c = currentDetail.clinic;
+    formHTML = `
+      <div class="panel-edit-form">
+        <div class="panel-field"><label>Name</label><input data-ef="name" value="${esc(c.name||'')}"/></div>
+        <div class="panel-field"><label>Address</label><input data-ef="address" value="${esc(c.address||'')}"/></div>
+        <div class="panel-field"><label>Phone</label><input data-ef="phone" value="${esc(c.phone||'')}"/></div>
+        <div class="panel-field"><label>Email</label><input data-ef="email" value="${esc(c.email||'')}"/></div>
+        <div class="panel-field"><label>Website</label><input data-ef="website" value="${esc(c.website||'')}"/></div>
+        <div style="display:flex;gap:6px;margin-top:10px">
+          <button class="btn-save"   onclick="savePanelForm('clinic',${id})">✓ Save</button>
+          <button class="btn-cancel" onclick="showDetailNodePanel(currentPanelNode)">✕ Cancel</button>
+        </div>
+      </div>`;
+  } else {
+    const p = currentDetail.providers.find(x => x.id === id);
+    if (!p) return;
+    const accVal = p.accepting_new_patients === true ? 'true' : p.accepting_new_patients === false ? 'false' : '';
+    formHTML = `
+      <div class="panel-edit-form">
+        <div class="panel-field"><label>Name</label><input data-ef="name" value="${esc(p.name||'')}"/></div>
+        <div class="panel-field"><label>Phone</label><input data-ef="phone" value="${esc(p.phone||'')}"/></div>
+        <div class="panel-field"><label>Specializations</label><input data-ef="specializations" value="${esc((p.specializations||[]).join(', '))}"/></div>
+        <div class="panel-field"><label>Bio</label><textarea data-ef="description" rows="3">${esc(p.description||'')}</textarea></div>
+        <div class="panel-field"><label>Accepting Patients</label>
+          <select data-ef="accepting_new_patients">
+            <option value="">Unknown</option>
+            <option value="true"  ${accVal==='true' ?'selected':''}>Yes</option>
+            <option value="false" ${accVal==='false'?'selected':''}>No</option>
+          </select>
+        </div>
+        <div style="display:flex;gap:6px;margin-top:10px">
+          <button class="btn-save"   onclick="savePanelForm('provider',${id})">✓ Save</button>
+          <button class="btn-cancel" onclick="showDetailNodePanel(currentPanelNode)">✕ Cancel</button>
+        </div>
+      </div>`;
+  }
+  panel.innerHTML = `<div class="dp-title" style="margin-bottom:14px">${type === 'clinic' ? '🏥 Edit Clinic' : '🧑‍⚕️ Edit Provider'}</div>${formHTML}`;
+}
+
+async function savePanelForm(type, id) {
+  const fields = {};
+  document.querySelectorAll('#detail-panel [data-ef]').forEach(el => { fields[el.dataset.ef] = el.value.trim(); });
+  try {
+    const url = type === 'clinic' ? `/api/clinics/${id}` : `/api/providers/${id}`;
+    const res = await fetch(url, { method:'PATCH', headers:{'Content-Type':'application/json'}, body: JSON.stringify({fields}) });
+    if (!res.ok) throw new Error((await res.json()).detail || 'Save failed');
+    if (type === 'clinic') {
+      Object.assign(currentDetail.clinic, fields);
+      document.getElementById('d-name').textContent = currentDetail.clinic.name || '—';
+    } else {
+      const p = currentDetail.providers.find(x => x.id === id);
+      if (p) {
+        if (fields.name) p.name = fields.name;
+        if (fields.phone !== undefined) p.phone = fields.phone;
+        if (fields.specializations !== undefined)
+          p.specializations = fields.specializations.split(',').map(s=>s.trim()).filter(Boolean);
+        if (fields.description !== undefined) p.description = fields.description;
+        if (fields.accepting_new_patients !== undefined)
+          p.accepting_new_patients = fields.accepting_new_patients === 'true' ? true
+                                   : fields.accepting_new_patients === 'false' ? false : null;
+      }
+    }
+    if (currentPanelNode) { currentPanelNode.data = type==='clinic' ? currentDetail.clinic : currentDetail.providers.find(x=>x.id===id); showDetailNodePanel(currentPanelNode); }
+    renderDetail(currentDetail);
+  } catch (e) { alert('Error: ' + e.message); }
+}
+
+function panelConfirmDelete(type, id) {
+  const panel = document.getElementById('detail-panel');
+  const label = type === 'clinic' ? 'this clinic and all its providers' : 'this provider';
+  const actionsEl = panel.querySelector('.panel-actions');
+  if (actionsEl) actionsEl.innerHTML = `
+    <div class="confirm-row" style="width:100%;flex-wrap:wrap">
+      <span>⚠️ Delete ${label}?</span>
+      <button class="btn-danger"  onclick="executePanelDelete('${type}',${id})">Yes, Delete</button>
+      <button class="btn-cancel"  onclick="showDetailNodePanel(currentPanelNode)">Cancel</button>
+    </div>`;
+}
+
+async function executePanelDelete(type, id) {
+  try {
+    const url = type === 'clinic' ? `/api/clinics/${id}` : `/api/providers/${id}`;
+    const res = await fetch(url, { method:'DELETE' });
+    if (!res.ok) throw new Error((await res.json()).detail || 'Delete failed');
+    if (type === 'clinic') {
+      goHome();
+    } else {
+      currentDetail.providers = currentDetail.providers.filter(x => x.id !== id);
+      renderDetail(currentDetail);
+      showTab('graph');
+    }
+  } catch (e) { alert('Error: ' + e.message); }
+}
+
+// ── Utility ───────────────────────────────────────────────
+function esc(str) {
+  if (str == null) return '';
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ══════════════════════════════════════════════════════════
+// INTAKE MODAL
+// ══════════════════════════════════════════════════════════
+let intakeModalClinicId  = null;
+let intakeModalRecords   = [];
+let intakeModalMode      = 'view'; // 'view' | 'edit'
+
+async function showIntakeModal(clinicId) {
+  const clinic     = currentDetail && currentDetail.clinic;
+  const clinicName = clinic ? (clinic.name || '') : '';
+  const kbPath     = clinic ? (clinic.kb_path || '') : '';
+  intakeModalClinicId = clinicId;
+  intakeModalMode     = 'view';
+  const overlay = document.getElementById('intake-modal-overlay');
+  const body    = document.getElementById('intake-modal-body');
+  document.getElementById('intake-modal-title').textContent = clinicName + ' — Screening Profile';
+  body.innerHTML = '<div class="state-msg" style="padding:40px 0"><div class="spinner"></div><p>Loading…</p></div>';
+  document.getElementById('intake-modal-footer-hint').textContent    = '';
+  document.getElementById('intake-modal-footer-actions').innerHTML   = '';
+  overlay.classList.add('open');
+
+  try {
+    const res = await fetch(`/api/clinics/${clinicId}/intake`);
+    if (!res.ok) throw new Error('No intake profile found.');
+    intakeModalRecords = await res.json();
+    renderIntakeModalView(kbPath);
+  } catch (e) {
+    body.innerHTML = `<div class="state-msg" style="padding:40px 0"><div class="icon">📭</div><p>${esc(e.message)}</p></div>`;
+  }
+}
+
+function renderIntakeModalView(kbPath) {
+  const body = document.getElementById('intake-modal-body');
+  let html = '';
+  if (kbPath) {
+    const filename = kbPath.split('/').pop();
+    html += `<div class="modal-file-badge">📄 ${esc(filename)}</div>`;
+  }
+  const sections = {};
+  for (const r of intakeModalRecords) {
+    if (!sections[r.section]) sections[r.section] = [];
+    sections[r.section].push(r);
+  }
+  for (const [section, rows] of Object.entries(sections)) {
+    html += `<div class="modal-section-heading">${esc(section)}</div>`;
+    for (const r of rows) {
+      html += `<div class="modal-qa-row">
+        <div class="modal-qa-q">${esc(r.question)}</div>
+        <div class="modal-qa-a">${renderModalAnswer(r)}</div>
+      </div>`;
+    }
+  }
+  body.innerHTML = html;
+  document.getElementById('intake-modal-footer-hint').textContent  = '';
+  document.getElementById('intake-modal-footer-actions').innerHTML =
+    `<button class="btn-edit" onclick="renderIntakeModalEditMode()">✏️ Edit Responses</button>`;
+}
+
+function renderIntakeModalEditMode() {
+  intakeModalMode = 'edit';
+  const body = document.getElementById('intake-modal-body');
+  const sections = {};
+  for (const r of intakeModalRecords) {
+    if (!sections[r.section]) sections[r.section] = [];
+    sections[r.section].push(r);
+  }
+  let html = '';
+  for (const [section, rows] of Object.entries(sections)) {
+    html += `<div class="modal-section-heading">${esc(section)}</div>`;
+    for (const r of rows) {
+      const q = INTAKE_QUESTIONS.find(x => x.id === r.question_id);
+      const qtype = q ? q.type : 'textarea';
+      html += `<div class="modal-qa-row" style="flex-direction:column;align-items:stretch;gap:8px">
+        <div class="modal-qa-q" style="color:var(--dark);font-weight:600">${esc(r.question)}</div>
+        ${renderModalEditInput(r, q, qtype)}
+      </div>`;
+    }
+  }
+  body.innerHTML = html;
+  document.getElementById('intake-modal-footer-hint').textContent  = 'Changes are saved to the knowledge base.';
+  document.getElementById('intake-modal-footer-actions').innerHTML =
+    `<button class="btn-cancel" onclick="renderIntakeModalView('')">✕ Cancel</button>
+     <button class="btn-save"   onclick="saveIntakeModalEdits()">✓ Save Changes</button>`;
+}
+
+function renderModalEditInput(r, q, qtype) {
+  const val = r.answer;
+  const inputStyle = 'width:100%;border:1.5px solid var(--border);border-radius:8px;padding:8px 12px;font-family:inherit;font-size:.85rem;outline:none;';
+  if (qtype === 'yn') {
+    const ysel = val === true  ? ' selected' : '';
+    const nsel = val === false ? ' selected' : '';
+    return `<select data-intake-edit="${r.question_id}" data-intake-qtype="yn" style="${inputStyle}">
+      <option value="">— not answered —</option>
+      <option value="true"  ${ysel}>Yes</option>
+      <option value="false" ${nsel}>No</option>
+    </select>`;
+  }
+  if (qtype === 'radio') {
+    const opts = q ? q.options : [];
+    return `<select data-intake-edit="${r.question_id}" data-intake-qtype="radio" style="${inputStyle}">
+      <option value="">— select —</option>
+      ${opts.map(o => `<option value="${esc(o.value)}" ${val===o.value?'selected':''}>${esc(o.label)}</option>`).join('')}
+    </select>`;
+  }
+  if (qtype === 'chips') {
+    const cur = Array.isArray(val) ? val.join(', ') : (val || '');
+    return `<input data-intake-edit="${r.question_id}" data-intake-qtype="chips"
+      value="${esc(cur)}" placeholder="Comma-separated values" style="${inputStyle}" />`;
+  }
+  if (qtype === 'number') {
+    return `<input data-intake-edit="${r.question_id}" data-intake-qtype="number"
+      type="number" value="${esc(val != null ? String(val) : '')}" style="${inputStyle};max-width:180px" />`;
+  }
+  return `<textarea data-intake-edit="${r.question_id}" data-intake-qtype="textarea"
+    rows="3" style="${inputStyle}">${esc(val != null ? String(val) : '')}</textarea>`;
+}
+
+async function saveIntakeModalEdits() {
+  const intake = {};
+  document.querySelectorAll('[data-intake-edit]').forEach(el => {
+    const id    = el.dataset.intakeEdit;
+    const qtype = el.dataset.intakeQtype;
+    const raw   = el.value.trim();
+    if (!raw) return;
+    if (qtype === 'yn')     intake[id] = raw === 'true';
+    else if (qtype === 'chips')  intake[id] = raw.split(',').map(s=>s.trim()).filter(Boolean);
+    else if (qtype === 'number') intake[id] = Number(raw);
+    else                          intake[id] = raw;
+  });
+  const btn = document.querySelector('#intake-modal-footer-actions .btn-save');
+  btn.disabled = true; btn.textContent = '⏳ Saving…';
+  try {
+    const res = await fetch(`/api/clinics/${intakeModalClinicId}/intake`, {
+      method:'PATCH', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ intake }),
+    });
+    if (!res.ok) throw new Error((await res.json()).detail || 'Save failed');
+    // Reload the updated records and return to view mode
+    const updated = await fetch(`/api/clinics/${intakeModalClinicId}/intake`);
+    intakeModalRecords = await updated.json();
+    renderIntakeModalView('');
+  } catch (e) {
+    btn.disabled = false; btn.textContent = '✓ Save Changes';
+    alert('Error: ' + e.message);
+  }
+}
+
+function closeIntakeModal() {
+  document.getElementById('intake-modal-overlay').classList.remove('open');
+  intakeModalMode = 'view';
+}
+
+// Close on backdrop click
+document.getElementById('intake-modal-overlay').addEventListener('click', e => {
+  if (e.target === e.currentTarget) closeIntakeModal();
+});
+
+function renderModalAnswer(r) {
+  const val = r.answer;
+  if (val === true)  return '<span style="color:#065f46;font-weight:700">✓ Yes</span>';
+  if (val === false) return '<span style="color:#991b1b;font-weight:700">✗ No</span>';
+  if (Array.isArray(val) && val.length) {
+    return `<div class="modal-qa-chips">${val.map(v => `<span class="modal-qa-chip">${esc(v)}</span>`).join('')}</div>`;
+  }
+  return `<span style="font-style:italic">${esc(r.answer_display)}</span>`;
+}
+</script>
+
+<!-- ── INTAKE MODAL OVERLAY ── -->
+<div class="modal-overlay" id="intake-modal-overlay">
+  <div class="modal-box">
+    <div class="modal-header">
+      <span style="font-size:1.3rem">🗂️</span>
+      <h2 id="intake-modal-title">Screening Profile</h2>
+      <button class="modal-close" onclick="closeIntakeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="intake-modal-body"></div>
+    <div class="modal-footer" id="intake-modal-footer">
+      <span class="modal-footer-left" id="intake-modal-footer-hint"></span>
+      <div class="modal-footer-right" id="intake-modal-footer-actions"></div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

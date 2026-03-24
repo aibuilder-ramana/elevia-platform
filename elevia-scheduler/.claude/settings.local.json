@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__elevia-scheduler__find_providers",
+      "mcp__elevia-scheduler__get_provider_details",
+      "Bash(curl -s http://localhost:8000/providers)",
+      "Bash(python3 -m json.tool)",
+      "Bash(curl -s \"http://localhost:8000/providers?issue=anxiety&insurance=Aetna&location=Hartford\")",
+      "Bash(curl -s http://localhost:8000/providers/1036640)",
+      "Bash(curl -s \"http://localhost:8000/availability/1036640?date=2026-03-18\")",
+      "Bash(curl -s -X POST http://localhost:8000/schedule -H \"Content-Type: application/json\" -d '{:*)",
+      "Bash(python3 -c \":*)",
+      "Bash(pip install:*)",
+      "Bash(python3 -c \"from rag import ingest_phq9, query_phq9; print\\(query_phq9\\(''depression hopeless suicidal''\\)[:300]\\)\")",
+      "Bash(curl -s -X POST http://localhost:8000/chat -H 'Content-Type: application/json' -d '{\"\"\"\"messages\"\"\"\":[{\"\"\"\"role\"\"\"\":\"\"\"\"user\"\"\"\",\"\"\"\"content\"\"\"\":\"\"\"\"@elevia I have been feeling really anxious and depressed lately\"\"\"\"}]}')",
+      "Bash(python -c \"from crawler import crawl_website; from extractor import extract_clinic_data; from database import save_clinic_with_providers; print\\(''All imports OK''\\)\")",
+      "Bash(python3 -c \"from playwright.sync_api import sync_playwright; print\\(''playwright installed''\\)\")",
+      "Bash(python3 -m playwright install chromium)",
+      "Bash(gh repo:*)",
+      "Bash(curl -s \"https://api.github.com/users/ramana-elevia/repos\")",
+      "Bash(python3 -c \"import sys,json; repos=json.load\\(sys.stdin\\); [print\\(r[''''name''''], r[''''clone_url'''']\\) for r in repos]\")",
+      "Bash(curl -s \"https://api.github.com/users/ramana-elevia/repos?per_page=50\")"
+    ]
+  }
+}

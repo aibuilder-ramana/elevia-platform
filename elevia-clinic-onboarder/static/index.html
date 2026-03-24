@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Elevia Clinic Onboarder</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌿</text></svg>"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --teal:   #35dcc2; --mint: #78eaca; --navy: #0f2137; --dark: #1a2b3c;
+      --text:   #2d3748; --muted: #718096; --light: #f0faf8; --border: #e2e8f0;
+      --white:  #ffffff;
+      --grad:   linear-gradient(135deg, #35dcc2, #78eaca);
+      --shadow: 0 8px 40px rgba(53,220,194,.12);
+      --r:      16px;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family:'Inter',sans-serif; background:var(--light); color:var(--text); min-height:100vh; }
+
+    /* ── HEADER ── */
+    header {
+      background:var(--navy); padding:0 40px; height:64px;
+      display:flex; align-items:center; gap:12px;
+      position:sticky; top:0; z-index:50;
+    }
+    .logo { font-size:1.5rem; }
+    header h1 {
+      font-size:1.1rem; font-weight:700; color:#fff;
+      background:var(--grad); -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+    }
+    header span { font-size:.8rem; color:rgba(255,255,255,.4); margin-left:16px; }
+
+    /* ── STEP INDICATOR ── */
+    .steps {
+      max-width:760px; margin:32px auto 0; padding:0 24px;
+      display:flex; align-items:center; gap:0;
+    }
+    .step { display:flex; align-items:center; flex:1; }
+    .step-dot {
+      width:32px; height:32px; border-radius:50%; border:2px solid var(--border);
+      background:var(--white); display:flex; align-items:center; justify-content:center;
+      font-size:.78rem; font-weight:700; color:var(--muted); flex-shrink:0;
+      transition:all .3s;
+    }
+    .step-dot.active { background:var(--grad); border-color:transparent; color:#fff; }
+    .step-dot.done   { background:var(--teal);  border-color:transparent; color:#fff; }
+    .step-label { font-size:.75rem; color:var(--muted); margin-left:8px; white-space:nowrap; }
+    .step-label.active { color:var(--teal); font-weight:600; }
+    .step-line { flex:1; height:2px; background:var(--border); margin:0 8px; transition:background .3s; }
+    .step-line.done { background:var(--teal); }
+
+    /* ── CARD ── */
+    .card {
+      background:var(--white); border:1px solid var(--border); border-radius:var(--r);
+      padding:40px; box-shadow:var(--shadow);
+    }
+    .card h2 { font-size:1.4rem; font-weight:800; color:var(--dark); margin-bottom:8px; }
+    .card .sub { font-size:.9rem; color:var(--muted); margin-bottom:32px; line-height:1.6; }
+
+    /* ── FORM ── */
+    .form-group { margin-bottom:22px; }
+    .form-group label { display:block; font-size:.85rem; font-weight:600; color:var(--dark); margin-bottom:7px; }
+    .form-group input, .form-group textarea, .form-group select {
+      width:100%; border:1.5px solid var(--border); border-radius:10px;
+      padding:12px 16px; font-family:inherit; font-size:.95rem; color:var(--text);
+      background:var(--white); outline:none; transition:border-color .2s;
+    }
+    .form-group input:focus, .form-group textarea:focus { border-color:var(--teal); }
+    .form-group textarea { resize:vertical; min-height:80px; }
+    .form-hint { font-size:.76rem; color:var(--muted); margin-top:5px; }
+
+    /* ── BUTTONS ── */
+    .btn {
+      display:inline-flex; align-items:center; gap:8px;
+      padding:13px 28px; border-radius:11px; font-family:inherit;
+      font-size:.95rem; font-weight:700; cursor:pointer; border:none;
+      transition:all .2s;
+    }
+    .btn-primary { background:var(--grad); color:#fff; box-shadow:0 4px 20px rgba(53,220,194,.3); }
+    .btn-primary:hover { transform:translateY(-1px); box-shadow:0 8px 28px rgba(53,220,194,.4); }
+    .btn-primary:disabled { opacity:.5; cursor:not-allowed; transform:none; }
+    .btn-outline { background:none; border:2px solid var(--border); color:var(--dark); }
+    .btn-outline:hover { border-color:var(--teal); color:var(--teal); }
+    .btn-danger  { background:#fee2e2; color:#dc2626; border:none; }
+    .btn-danger:hover { background:#fecaca; }
+
+    /* ── STEP PANELS ── */
+    .panel { display:none; }
+    .panel.active { display:block; }
+    .panel-wrap { max-width:760px; margin:24px auto 80px; padding:0 24px; }
+
+    /* ── LOADING ── */
+    .loading-card { text-align:center; padding:60px 40px; }
+    .spinner-ring {
+      width:56px; height:56px; border:5px solid var(--border);
+      border-top-color:var(--teal); border-radius:50%;
+      animation:spin .9s linear infinite; margin:0 auto 24px;
+    }
+    @keyframes spin { to { transform:rotate(360deg); } }
+    .loading-steps { margin-top:24px; text-align:left; max-width:360px; margin:24px auto 0; }
+    .lstep { display:flex; align-items:center; gap:10px; padding:8px 0; font-size:.87rem; color:var(--muted); }
+    .lstep .licon { font-size:1rem; width:22px; text-align:center; }
+    .lstep.done { color:var(--teal); }
+    .lstep.active { color:var(--dark); font-weight:600; }
+
+    /* ── REVIEW TABS ── */
+    .review-tabs {
+      display:flex; gap:4px; background:var(--light);
+      border-radius:12px; padding:5px; margin-bottom:24px;
+    }
+    .rtab {
+      flex:1; padding:10px; border-radius:9px; border:none; background:none;
+      font-family:inherit; font-size:.9rem; font-weight:500; color:var(--muted);
+      cursor:pointer; transition:all .2s; display:flex; align-items:center; justify-content:center; gap:7px;
+    }
+    .rtab.active { background:var(--white); color:var(--dark); box-shadow:0 2px 8px rgba(0,0,0,.07); }
+
+    /* ── TEXT VIEW ── */
+    .section-label {
+      font-size:.7rem; font-weight:700; color:var(--teal); text-transform:uppercase;
+      letter-spacing:.8px; margin-bottom:12px;
+    }
+    .clinic-block { margin-bottom:32px; }
+    .attr-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+    .attr-item label { font-size:.75rem; font-weight:600; color:var(--muted); display:block; margin-bottom:4px; }
+    .attr-item input, .attr-item textarea {
+      width:100%; border:1.5px solid var(--border); border-radius:8px;
+      padding:9px 13px; font-family:inherit; font-size:.88rem; color:var(--text);
+      outline:none; transition:border-color .2s;
+    }
+    .attr-item input:focus, .attr-item textarea:focus { border-color:var(--teal); }
+    .attr-item.full { grid-column:1/-1; }
+    .chips-edit { display:flex; flex-wrap:wrap; gap:6px; margin-top:4px; }
+    .chip-tag {
+      background:rgba(53,220,194,.12); color:#1a9e8e;
+      border:1px solid rgba(53,220,194,.25); border-radius:20px;
+      padding:4px 12px; font-size:.76rem; font-weight:600;
+    }
+    .provider-block {
+      border:1px solid var(--border); border-radius:var(--r); padding:20px 24px;
+      margin-bottom:16px; position:relative;
+    }
+    .provider-block .p-name { font-weight:700; font-size:1rem; color:var(--dark); margin-bottom:4px; }
+    .provider-block .p-title { font-size:.8rem; color:var(--muted); margin-bottom:14px; }
+    .accepting-badge {
+      position:absolute; top:18px; right:20px;
+      font-size:.72rem; font-weight:700; padding:3px 10px; border-radius:20px;
+    }
+    .accepting-badge.yes { background:#d1fae5; color:#065f46; }
+    .accepting-badge.no  { background:#fee2e2; color:#991b1b; }
+    .accepting-badge.unk { background:#f3f4f6; color:#6b7280; }
+
+    /* ── GRAPH VIEW ── */
+    #graph-wrapper {
+      display:flex; gap:16px; align-items:flex-start;
+    }
+    #graph-container {
+      flex:1; min-width:0; height:560px;
+      border:1.5px solid var(--border); border-radius:var(--r);
+      overflow:hidden; background:#f8fbff;
+    }
+    #graph-svg { width:100%; height:100%; }
+    #detail-panel {
+      width:260px; flex-shrink:0;
+      background:var(--white); border:1.5px solid var(--border); border-radius:var(--r);
+      padding:20px; box-shadow:var(--shadow); font-size:.84rem;
+      height:560px; overflow-y:auto;
+    }
+    #detail-panel .dp-title { font-weight:800; color:var(--dark); font-size:.95rem; margin-bottom:4px; }
+    #detail-panel .dp-type  { font-size:.72rem; font-weight:700; color:var(--teal); text-transform:uppercase; letter-spacing:.5px; margin-bottom:14px; }
+    #detail-panel .dp-row   { margin-bottom:10px; }
+    #detail-panel .dp-label { font-size:.72rem; font-weight:600; color:var(--muted); display:block; margin-bottom:2px; }
+    #detail-panel .dp-val   { font-size:.84rem; color:var(--dark); line-height:1.5; }
+    #detail-panel .dp-chip  {
+      display:inline-block; background:rgba(53,220,194,.12); color:#1a9e8e;
+      border-radius:20px; padding:3px 10px; font-size:.72rem; font-weight:600;
+      margin:2px 3px 2px 0;
+    }
+    .graph-hint { text-align:center; font-size:.8rem; color:var(--muted); margin-top:8px; }
+
+    /* ── SAVE BAR ── */
+    .save-bar {
+      background:var(--white); border-top:1px solid var(--border);
+      padding:20px 24px; display:flex; align-items:center; justify-content:space-between;
+      border-radius:0 0 var(--r) var(--r); margin-top:32px;
+      box-shadow:0 -4px 20px rgba(0,0,0,.05);
+    }
+    .save-bar .save-info { font-size:.85rem; color:var(--muted); }
+    .save-bar .save-info strong { color:var(--dark); }
+
+    /* ── SUCCESS ── */
+    .success-card { text-align:center; padding:60px 40px; }
+    .success-icon { font-size:4rem; margin-bottom:20px; }
+    .success-card h2 { font-size:1.6rem; font-weight:800; color:var(--dark); margin-bottom:12px; }
+    .success-card p  { color:var(--muted); font-size:.95rem; line-height:1.7; max-width:440px; margin:0 auto 32px; }
+    .success-stats { display:flex; gap:32px; justify-content:center; margin-bottom:40px; }
+    .sstat strong { display:block; font-size:2rem; font-weight:800; color:var(--teal); line-height:1; }
+    .sstat span   { font-size:.8rem; color:var(--muted); }
+
+    /* ── UTILS ── */
+    .mt-8  { margin-top:8px;  }
+    .mt-16 { margin-top:16px; }
+    .mt-24 { margin-top:24px; }
+    .divider { border:none; border-top:1px solid var(--border); margin:28px 0; }
+    .error-box {
+      background:#fef2f2; border:1px solid #fecaca; border-radius:10px;
+      padding:14px 18px; font-size:.87rem; color:#dc2626; margin-top:16px;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">🌿</div>
+  <h1>Elevia Clinic Onboarder</h1>
+  <span>Powered by AI — crawls your website and extracts clinic &amp; provider data automatically</span>
+</header>
+
+<!-- Step indicator -->
+<div class="steps">
+  <div class="step">
+    <div class="step-dot active" id="dot-1">1</div>
+    <span class="step-label active" id="lbl-1">Enter Website</span>
+  </div>
+  <div class="step-line" id="line-1"></div>
+  <div class="step">
+    <div class="step-dot" id="dot-2">2</div>
+    <span class="step-label" id="lbl-2">AI Extraction</span>
+  </div>
+  <div class="step-line" id="line-2"></div>
+  <div class="step">
+    <div class="step-dot" id="dot-3">3</div>
+    <span class="step-label" id="lbl-3">Review &amp; Confirm</span>
+  </div>
+  <div class="step-line" id="line-3"></div>
+  <div class="step">
+    <div class="step-dot" id="dot-4">4</div>
+    <span class="step-label" id="lbl-4">Saved</span>
+  </div>
+</div>
+
+<!-- ── STEP 1: Form ──────────────────────────────── -->
+<div class="panel-wrap">
+<div class="panel active" id="panel-1">
+  <div class="card">
+    <h2>Onboard a New Clinic</h2>
+    <p class="sub">Enter the clinic name and website URL. Elevia will crawl the site and extract clinic details and provider profiles automatically using AI.</p>
+
+    <div class="form-group">
+      <label>Clinic Name</label>
+      <input id="clinic-name" type="text" placeholder="e.g. Orange Psychiatry Associates" />
+    </div>
+    <div class="form-group">
+      <label>Clinic Website URL</label>
+      <input id="clinic-url" type="url" placeholder="https://www.example-clinic.com" />
+      <div class="form-hint">The crawler will visit up to 8 pages to find provider information.</div>
+    </div>
+
+    <div id="step1-error" class="error-box" style="display:none"></div>
+
+    <button class="btn btn-primary" id="btn-crawl">
+      🔍 Start AI Extraction
+    </button>
+  </div>
+</div>
+
+<!-- ── STEP 2: Loading ───────────────────────────── -->
+<div class="panel" id="panel-2">
+  <div class="card loading-card">
+    <div class="spinner-ring"></div>
+    <h2 style="font-size:1.3rem;color:var(--dark)">Extracting clinic data…</h2>
+    <p style="color:var(--muted);font-size:.9rem;margin-top:8px">This usually takes 20–45 seconds.</p>
+    <div class="loading-steps">
+      <div class="lstep done"   id="ls-1"><span class="licon">✓</span> Fetching website pages</div>
+      <div class="lstep active" id="ls-2"><span class="licon">⚙️</span> Analysing content with AI</div>
+      <div class="lstep"        id="ls-3"><span class="licon">📋</span> Structuring clinic &amp; providers</div>
+      <div class="lstep"        id="ls-4"><span class="licon">✅</span> Ready to review</div>
+    </div>
+    <button class="btn btn-outline" style="margin-top:28px" onclick="cancelAndBack()">← Back</button>
+  </div>
+</div>
+
+<!-- ── STEP 3: Review ───────────────────────────── -->
+<div class="panel" id="panel-3">
+
+  <div class="review-tabs">
+    <button class="rtab active" id="rtab-text"  onclick="showReviewTab('text')">📋 Text View</button>
+    <button class="rtab"        id="rtab-graph" onclick="showReviewTab('graph')">🔮 Graph View</button>
+  </div>
+
+  <!-- Text Tab -->
+  <div id="review-text">
+    <div class="card">
+      <div class="section-label">Clinic Information</div>
+      <div class="clinic-block">
+        <div class="attr-grid" id="clinic-fields"></div>
+      </div>
+      <hr class="divider"/>
+      <div class="section-label">Providers <span id="provider-count" style="font-size:.75rem;color:var(--muted);font-weight:400;margin-left:6px"></span></div>
+      <div id="provider-list"></div>
+    </div>
+  </div>
+
+  <!-- Graph Tab -->
+  <div id="review-graph" style="display:none">
+    <div class="card" style="padding:20px">
+      <div id="graph-wrapper">
+        <div id="graph-container">
+          <svg id="graph-svg"></svg>
+        </div>
+        <div id="detail-panel">
+          <p style="color:var(--muted);font-size:.85rem;text-align:center;margin-top:40px">
+            👆 Click any node<br/>to see its details
+          </p>
+        </div>
+      </div>
+      <p class="graph-hint">Drag nodes to rearrange · Scroll to zoom · Click to inspect</p>
+    </div>
+  </div>
+
+  <!-- Save bar -->
+  <div class="save-bar">
+    <div class="save-info">
+      <strong id="save-summary">Review the data above before saving.</strong><br/>
+      Changes made in the text view will be saved.
+    </div>
+    <div style="display:flex;gap:12px">
+      <button class="btn btn-outline" onclick="restart()">← Back</button>
+      <button class="btn btn-primary" id="btn-save" onclick="saveData()">
+        ✓ Confirm &amp; Save to Database
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ── STEP 4: Saved ─────────────────────────────── -->
+<div class="panel" id="panel-4">
+  <div class="card success-card">
+    <div class="success-icon">🎉</div>
+    <h2>Clinic Onboarded Successfully!</h2>
+    <p>The clinic and all provider profiles have been saved to the Elevia Platform database and are now discoverable by patients.</p>
+    <div class="success-stats">
+      <div class="sstat">
+        <strong id="stat-providers">—</strong>
+        <span>Providers saved</span>
+      </div>
+      <div class="sstat">
+        <strong id="stat-clinic">—</strong>
+        <span>Clinic ID</span>
+      </div>
+    </div>
+    <button class="btn btn-primary" onclick="restart()">+ Onboard Another Clinic</button>
+  </div>
+</div>
+
+</div><!-- /panel-wrap -->
+
+<script>
+// ── State ─────────────────────────────────────────────────
+let extracted = null;   // { clinic: {}, providers: [] }
+let crawlAbort = null;  // AbortController for the in-flight crawl request
+
+// ── Step nav helpers ──────────────────────────────────────
+function goStep(n) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-' + n).classList.add('active');
+
+  for (let i = 1; i <= 4; i++) {
+    const dot = document.getElementById('dot-' + i);
+    const lbl = document.getElementById('lbl-' + i);
+    dot.classList.toggle('done',   i < n);
+    dot.classList.toggle('active', i === n);
+    lbl.classList.toggle('active', i === n);
+    if (i < 4) {
+      document.getElementById('line-' + i).classList.toggle('done', i < n);
+    }
+  }
+}
+
+// ── Step 1 → 2 → 3 ───────────────────────────────────────
+document.getElementById('btn-crawl').addEventListener('click', async () => {
+  const name = document.getElementById('clinic-name').value.trim();
+  const url  = document.getElementById('clinic-url').value.trim();
+  const errBox = document.getElementById('step1-error');
+  errBox.style.display = 'none';
+
+  if (!name || !url) {
+    errBox.textContent = 'Please enter both the clinic name and website URL.';
+    errBox.style.display = 'block';
+    return;
+  }
+
+  goStep(2);
+
+  crawlAbort = new AbortController();
+
+  // Animate loading steps
+  const lsIds = ['ls-2','ls-3','ls-4'];
+  let lsIdx = 0;
+  const lsTimer = setInterval(() => {
+    if (lsIdx > 0) {
+      const prev = document.getElementById(lsIds[lsIdx - 1]);
+      prev.classList.remove('active'); prev.classList.add('done');
+      prev.querySelector('.licon').textContent = '✓';
+    }
+    if (lsIdx < lsIds.length) {
+      document.getElementById(lsIds[lsIdx]).classList.add('active');
+      lsIdx++;
+    } else {
+      clearInterval(lsTimer);
+    }
+  }, 8000);
+
+  try {
+    const res  = await fetch('/crawl', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ clinic_name: name, website_url: url }),
+      signal: crawlAbort.signal,
+    });
+    clearInterval(lsTimer);
+
+    if (!res.ok) {
+      const err = await res.json();
+      goStep(1);
+      document.getElementById('step1-error').textContent = err.detail || 'Extraction failed.';
+      document.getElementById('step1-error').style.display = 'block';
+      return;
+    }
+
+    extracted = await res.json();
+    if (extracted.error) {
+      goStep(1);
+      document.getElementById('step1-error').textContent = extracted.error;
+      document.getElementById('step1-error').style.display = 'block';
+      return;
+    }
+
+    renderTextView();
+    renderGraph();
+    updateSaveSummary();
+    goStep(3);
+
+  } catch (e) {
+    clearInterval(lsTimer);
+    if (e.name === 'AbortError') return;  // user clicked Back — silent
+    goStep(1);
+    document.getElementById('step1-error').textContent = 'Network error: ' + e.message;
+    document.getElementById('step1-error').style.display = 'block';
+  }
+});
+
+// ── Render: Text View ─────────────────────────────────────
+function renderTextView() {
+  const c = extracted.clinic || {};
+  const clinicFields = document.getElementById('clinic-fields');
+  clinicFields.innerHTML = '';
+
+  const cFields = [
+    { key:'name',      label:'Clinic Name',  full:false },
+    { key:'address',   label:'Address',      full:true  },
+    { key:'phone',     label:'Phone',        full:false },
+    { key:'email',     label:'Email',        full:false },
+    { key:'website',   label:'Website',      full:false },
+  ];
+
+  cFields.forEach(f => {
+    const div = document.createElement('div');
+    div.className = 'attr-item' + (f.full ? ' full' : '');
+    div.innerHTML = `<label>${f.label}</label>
+      <input data-field="clinic.${f.key}" value="${escHtml(c[f.key] || '')}" />`;
+    clinicFields.appendChild(div);
+  });
+
+  // Specialties chips
+  const specsDiv = document.createElement('div');
+  specsDiv.className = 'attr-item full';
+  const specs = c.specialties || [];
+  specsDiv.innerHTML = `<label>Specialties</label>
+    <div class="chips-edit">${specs.map(s => `<span class="chip-tag">${escHtml(s)}</span>`).join('')}</div>
+    <input data-field="clinic.specialties" value="${escHtml(specs.join(', '))}" placeholder="comma-separated" style="margin-top:8px"/>`;
+  clinicFields.appendChild(specsDiv);
+
+  // Providers
+  const provList = document.getElementById('provider-list');
+  provList.innerHTML = '';
+  const providers = extracted.providers || [];
+  document.getElementById('provider-count').textContent = `(${providers.length} found)`;
+
+  providers.forEach((p, i) => {
+    const block = document.createElement('div');
+    block.className = 'provider-block';
+
+    const acc = p.accepting_new_patients === true  ? 'yes' :
+                p.accepting_new_patients === false ? 'no'  : null;
+    const accBadge = acc === 'yes' ? '<span class="accepting-badge yes">✓ Accepting</span>'
+                   : acc === 'no'  ? '<span class="accepting-badge no">✗ Not Accepting</span>'
+                   : '';
+
+    block.innerHTML = `
+      <div class="p-name">${escHtml(p.name || 'Provider')}</div>
+      <div class="p-title">${escHtml(p.title || '')}</div>
+      ${accBadge}
+      <div class="attr-grid">
+        <div class="attr-item">
+          <label>Years of Practice</label>
+          <input data-field="provider.${i}.years_of_practice" value="${escHtml(p.years_of_practice || '')}"/>
+        </div>
+        <div class="attr-item">
+          <label>Phone</label>
+          <input data-field="provider.${i}.phone" value="${escHtml(p.phone || '')}"/>
+        </div>
+        <div class="attr-item full">
+          <label>Specializations</label>
+          <input data-field="provider.${i}.specializations" value="${escHtml((p.specializations||[]).join(', '))}"/>
+        </div>
+        <div class="attr-item full">
+          <label>Bio / Description</label>
+          <textarea data-field="provider.${i}.description">${escHtml(p.description || '')}</textarea>
+        </div>
+      </div>`;
+    provList.appendChild(block);
+  });
+}
+
+// ── Collect edits from text view ──────────────────────────
+function collectEdits() {
+  document.querySelectorAll('[data-field]').forEach(el => {
+    const path = el.dataset.field.split('.');
+    const val  = el.value.trim();
+
+    if (path[0] === 'clinic') {
+      if (path[1] === 'specialties') {
+        extracted.clinic.specialties = val.split(',').map(s => s.trim()).filter(Boolean);
+      } else {
+        extracted.clinic[path[1]] = val;
+      }
+    } else if (path[0] === 'provider') {
+      const idx   = parseInt(path[1]);
+      const field = path[2];
+      if (field === 'specializations') {
+        extracted.providers[idx].specializations = val.split(',').map(s => s.trim()).filter(Boolean);
+      } else {
+        extracted.providers[idx][field] = val;
+      }
+    }
+  });
+}
+
+function updateSaveSummary() {
+  const pCount = (extracted.providers || []).length;
+  document.getElementById('save-summary').textContent =
+    `${escHtml(extracted.clinic?.name || 'Clinic')} · ${pCount} provider${pCount !== 1 ? 's' : ''} ready to save`;
+}
+
+// ── Render: Graph View ────────────────────────────────────
+function renderGraph() {
+  const svg    = d3.select('#graph-svg');
+  svg.selectAll('*').remove();
+
+  const container = document.getElementById('graph-container');
+  const W = container.clientWidth;
+  const H = container.clientHeight;
+
+  // Defs — gradient
+  const defs = svg.append('defs');
+  const grad = defs.append('linearGradient').attr('id','nodeGrad')
+    .attr('x1','0%').attr('y1','0%').attr('x2','100%').attr('y2','100%');
+  grad.append('stop').attr('offset','0%').attr('stop-color','#35dcc2');
+  grad.append('stop').attr('offset','100%').attr('stop-color','#78eaca');
+
+  const gradProv = defs.append('linearGradient').attr('id','provGrad')
+    .attr('x1','0%').attr('y1','0%').attr('x2','100%').attr('y2','100%');
+  gradProv.append('stop').attr('offset','0%').attr('stop-color','#4f8ef7');
+  gradProv.append('stop').attr('offset','100%').attr('stop-color','#6ecfb0');
+
+  // Nodes + links
+  const c = extracted.clinic || {};
+  const providers = extracted.providers || [];
+
+  const nodes = [
+    { id:'clinic', type:'clinic', data: c },
+    ...providers.map((p, i) => ({ id:`p${i}`, type:'provider', data: p })),
+  ];
+  const links = providers.map((_, i) => ({ source:'clinic', target:`p${i}` }));
+
+  const zoomG = svg.append('g');
+
+  svg.call(d3.zoom()
+    .scaleExtent([0.3, 3])
+    .on('zoom', e => zoomG.attr('transform', e.transform)));
+
+  const sim = d3.forceSimulation(nodes)
+    .force('link',    d3.forceLink(links).id(d => d.id).distance(d => providers.length > 8 ? 140 : 180))
+    .force('charge',  d3.forceManyBody().strength(-420))
+    .force('center',  d3.forceCenter(W / 2, H / 2))
+    .force('collide', d3.forceCollide(d => d.type === 'clinic' ? 70 : 48));
+
+  // Links
+  const link = zoomG.append('g').selectAll('line').data(links).join('line')
+    .attr('stroke', '#c8e6e0').attr('stroke-width', 2).attr('stroke-dasharray', '5 4');
+
+  // Node groups
+  const node = zoomG.append('g').selectAll('g').data(nodes).join('g')
+    .style('cursor','pointer')
+    .call(d3.drag()
+      .on('start', (e, d) => { if (!e.active) sim.alphaTarget(0.3).restart(); d.fx=d.x; d.fy=d.y; })
+      .on('drag',  (e, d) => { d.fx=e.x; d.fy=e.y; })
+      .on('end',   (e, d) => { if (!e.active) sim.alphaTarget(0); d.fx=null; d.fy=null; }))
+    .on('click', (e, d) => showDetail(d));
+
+  // Circles
+  node.append('circle')
+    .attr('r', d => d.type === 'clinic' ? 52 : 36)
+    .attr('fill', d => d.type === 'clinic' ? 'url(#nodeGrad)' : 'url(#provGrad)')
+    .attr('stroke', '#fff').attr('stroke-width', 3)
+    .attr('filter', 'drop-shadow(0 4px 12px rgba(53,220,194,.3))');
+
+  // Labels
+  node.append('text')
+    .attr('text-anchor','middle').attr('dy','0.35em')
+    .attr('fill','#fff').attr('font-family','Inter,sans-serif')
+    .attr('font-weight','700').attr('pointer-events','none')
+    .each(function(d) {
+      const el = d3.select(this);
+      if (d.type === 'clinic') {
+        el.attr('font-size', '11px');
+        const words = (d.data.name || 'Clinic').split(' ');
+        const lines = [];
+        let cur = '';
+        words.forEach(w => {
+          const test = cur ? cur + ' ' + w : w;
+          if (test.length > 12) { lines.push(cur); cur = w; } else { cur = test; }
+        });
+        if (cur) lines.push(cur);
+        const offset = -(lines.length - 1) * 7;
+        lines.forEach((ln, li) => {
+          el.append('tspan').attr('x', 0).attr('dy', li === 0 ? offset : 14).text(ln);
+        });
+      } else {
+        el.attr('font-size', '10px');
+        const name = d.data.name || 'Provider';
+        const parts = name.replace(/^Dr\.?\s*/i, '').split(' ');
+        const last = parts[parts.length - 1];
+        el.append('tspan').attr('x', 0).attr('dy', '-6').text('🧑‍⚕️');
+        el.append('tspan').attr('x', 0).attr('dy', '14').text(last.length > 10 ? last.slice(0, 9) + '…' : last);
+      }
+    });
+
+  sim.on('tick', () => {
+    link.attr('x1', d => d.source.x).attr('y1', d => d.source.y)
+        .attr('x2', d => d.target.x).attr('y2', d => d.target.y);
+    node.attr('transform', d => `translate(${d.x},${d.y})`);
+  });
+}
+
+function showDetail(d) {
+  const panel = document.getElementById('detail-panel');
+  const data  = d.data;
+  const isClinic = d.type === 'clinic';
+
+  const chips = arr => (arr || []).map(s => `<span class="dp-chip">${escHtml(s)}</span>`).join('');
+
+  let html = `
+    <div class="dp-title">${escHtml(isClinic ? data.name : data.name) || '—'}</div>
+    <div class="dp-type">${isClinic ? '🏥 Clinic' : '🧑‍⚕️ Provider'}</div>`;
+
+  if (isClinic) {
+    html += row('Address',     data.address);
+    html += row('Phone',       data.phone);
+    html += row('Email',       data.email);
+    html += row('Website',     data.website);
+    html += `<div class="dp-row"><span class="dp-label">Specialties</span><div>${chips(data.specialties)}</div></div>`;
+  } else {
+    html += row('Title',             data.title);
+    html += row('Years of Practice', data.years_of_practice);
+    html += row('Phone',             data.phone);
+    const acc = data.accepting_new_patients === true ? '✓ Accepting' :
+                data.accepting_new_patients === false ? '✗ Not Accepting' : 'Unknown';
+    html += row('New Patients', acc);
+    html += `<div class="dp-row"><span class="dp-label">Specializations</span><div>${chips(data.specializations)}</div></div>`;
+    if (data.description) {
+      html += `<div class="dp-row"><span class="dp-label">Bio</span><div class="dp-val">${escHtml(data.description)}</div></div>`;
+    }
+  }
+
+  panel.innerHTML = html;
+}
+
+function row(label, val) {
+  if (!val) return '';
+  return `<div class="dp-row"><span class="dp-label">${label}</span><span class="dp-val">${escHtml(String(val))}</span></div>`;
+}
+
+// ── Review tab switcher ───────────────────────────────────
+function showReviewTab(tab) {
+  document.getElementById('review-text').style.display  = tab === 'text'  ? '' : 'none';
+  document.getElementById('review-graph').style.display = tab === 'graph' ? '' : 'none';
+  document.getElementById('rtab-text').classList.toggle('active',  tab === 'text');
+  document.getElementById('rtab-graph').classList.toggle('active', tab === 'graph');
+  if (tab === 'graph') renderGraph();
+}
+
+// ── Save ──────────────────────────────────────────────────
+async function saveData() {
+  collectEdits();
+
+  const btn = document.getElementById('btn-save');
+  btn.disabled = true;
+  btn.textContent = '⏳ Saving…';
+
+  try {
+    const res = await fetch('/save', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ clinic: extracted.clinic, providers: extracted.providers }),
+    });
+    const result = await res.json();
+
+    if (!res.ok) {
+      alert('Save failed: ' + (result.detail || JSON.stringify(result)));
+      btn.disabled = false; btn.textContent = '✓ Confirm & Save to Database';
+      return;
+    }
+
+    document.getElementById('stat-providers').textContent = result.providers_saved;
+    document.getElementById('stat-clinic').textContent    = '#' + result.clinic_id;
+    goStep(4);
+  } catch (e) {
+    alert('Network error: ' + e.message);
+    btn.disabled = false; btn.textContent = '✓ Confirm & Save to Database';
+  }
+}
+
+// ── Cancel crawl and go back to step 1 ───────────────────
+function cancelAndBack() {
+  if (crawlAbort) { crawlAbort.abort(); crawlAbort = null; }
+  goStep(1);
+}
+
+// ── Restart ───────────────────────────────────────────────
+function restart() {
+  extracted = null;
+  document.getElementById('clinic-name').value = '';
+  document.getElementById('clinic-url').value  = '';
+  document.getElementById('clinic-fields').innerHTML = '';
+  document.getElementById('provider-list').innerHTML = '';
+  document.getElementById('step1-error').style.display = 'none';
+  document.getElementById('btn-save').disabled = false;
+  document.getElementById('btn-save').textContent = '✓ Confirm & Save to Database';
+  showReviewTab('text');
+  goStep(1);
+}
+
+// ── Utility ───────────────────────────────────────────────
+function escHtml(str) {
+  if (str == null) return '';
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+</script>
+</body>
+</html>
