@@ -4,7 +4,7 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Elevia Clinic Onboarder</title>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌿</text></svg>"/>
+  <link rel="icon" type="image/png" href="/static/icon.png"/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
   <style>
@@ -26,12 +26,11 @@
       display:flex; align-items:center; gap:12px;
       position:sticky; top:0; z-index:50;
     }
-    .logo { font-size:1.5rem; }
-    header h1 {
-      font-size:1.1rem; font-weight:700; color:#fff;
-      background:var(--grad); -webkit-background-clip:text; -webkit-text-fill-color:transparent;
-    }
-    header span { font-size:.8rem; color:rgba(255,255,255,.4); margin-left:16px; }
+    .header-logo { display:flex; align-items:center; gap:8px; }
+    .header-icon  { height:30px; width:auto; object-fit:contain; }
+    .header-word  { height:24px; width:auto; object-fit:contain; }
+    .header-divider { width:1px; height:20px; background:rgba(255,255,255,.15); margin:0 8px; }
+    header span { font-size:.8rem; color:rgba(255,255,255,.4); }
 
     /* ── STEP INDICATOR ── */
     .steps {
@@ -214,9 +213,12 @@
 <body>
 
 <header>
-  <div class="logo">🌿</div>
-  <h1>Elevia Clinic Onboarder</h1>
-  <span>Powered by AI — crawls your website and extracts clinic &amp; provider data automatically</span>
+  <div class="header-logo">
+    <img src="/static/icon-dark.png" class="header-icon" alt=""/>
+    <img src="/static/logo-dark.png" class="header-word" alt="Elevia"/>
+  </div>
+  <div class="header-divider"></div>
+  <span>Clinic Onboarder — AI-powered clinic &amp; provider data extraction</span>
 </header>
 
 <!-- Step indicator -->
