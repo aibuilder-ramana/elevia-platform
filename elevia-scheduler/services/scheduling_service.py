@@ -22,11 +22,15 @@ def schedule(appt: Appointment) -> dict:
 
     description = "\n".join(lines)
 
+    provider_email = provider.get("contact", {}).get("email") or None
+
     try:
         event_id = create_event(
             patient_name=appt.patient_name,
             start_time=appt.time,
             description=description,
+            provider_email=provider_email,
+            patient_email=appt.patient_email,
         )
     except ValueError:
         return {

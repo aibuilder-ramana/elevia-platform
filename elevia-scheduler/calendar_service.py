@@ -14,17 +14,30 @@ def get_calendar_service():
     return build("calendar", "v3", credentials=creds)
 
 
-def create_event(patient_name: str, start_time: str, description: str = "") -> str:
+def create_event(
+    patient_name: str,
+    start_time: str,
+    description: str = "",
+    provider_email: str = None,
+    patient_email: str = None,
+) -> str:
     service = get_calendar_service()
 
     start = datetime.fromisoformat(start_time)
     end = start + timedelta(minutes=30)
+
+    attendees = []
+    if provider_email:
+        attendees.append({"email": provider_email, "displayName": "Provider"})
+    if patient_email:
+        attendees.append({"email": patient_email, "displayName": patient_name})
 
     event = {
         "summary": f"Appointment with {patient_name}",
         "description": description,
         "start": {"dateTime": start.isoformat(), "timeZone": "America/New_York"},
         "end":   {"dateTime": end.isoformat(),   "timeZone": "America/New_York"},
+        "attendees": attendees,
         "reminders": {
             "useDefault": False,
             "overrides": [
