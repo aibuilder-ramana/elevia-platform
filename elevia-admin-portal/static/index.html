@@ -339,6 +339,48 @@
     .isr-label { min-width:170px; max-width:170px; font-weight:600; color:var(--muted); font-size:.76rem; flex-shrink:0; padding-top:2px; }
     .isr-val   { color:var(--dark); line-height:1.5; flex:1; }
 
+    /* ── INTAKE FORMS CARD GRID (step 3) ── */
+    .forms-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(210px,1fr)); gap:18px; }
+    .form-card { border:2px solid var(--border); border-radius:14px; overflow:hidden; background:var(--white); transition:border-color .2s,box-shadow .2s,transform .15s; }
+    .form-card:hover { transform:translateY(-3px); box-shadow:0 10px 32px rgba(53,220,194,.14); border-color:#b2e8e0; }
+    .form-card.selected { border-color:var(--teal); box-shadow:0 0 0 3px rgba(53,220,194,.12); }
+    .form-card-thumb { height:190px; overflow:hidden; background:#f8fafc; border-bottom:1px solid var(--border); position:relative; cursor:pointer; }
+    .form-card-thumb:hover .fc-hint { opacity:1; }
+    .fc-hint { position:absolute; inset:0; background:rgba(15,33,55,.42); display:flex; align-items:center; justify-content:center; color:#fff; font-size:.78rem; font-weight:700; letter-spacing:.04em; opacity:0; transition:opacity .2s; backdrop-filter:blur(2px); }
+    .form-mini-inner { width:640px; transform:scale(0.322); transform-origin:top left; pointer-events:none; padding:20px 24px; background:#fff; font-family:'Inter',sans-serif; }
+    .form-card-footer { display:flex; align-items:center; gap:10px; padding:11px 14px; border-top:1px solid var(--border); background:var(--white); }
+    .form-card-name { flex:1; font-size:.84rem; font-weight:700; color:var(--dark); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .form-card-cb { width:20px; height:20px; accent-color:var(--teal); cursor:pointer; flex-shrink:0; }
+    .form-overlay { position:fixed; inset:0; z-index:300; background:rgba(15,33,55,.52); display:flex; align-items:center; justify-content:center; padding:20px; }
+    .form-overlay.hidden { display:none; }
+    .form-overlay-box { background:var(--white); border-radius:18px; width:100%; max-width:660px; max-height:88vh; overflow:hidden; display:flex; flex-direction:column; box-shadow:0 24px 80px rgba(0,0,0,.35); }
+    .form-overlay-hdr { padding:18px 24px 14px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:12px; flex-shrink:0; position:sticky; top:0; background:var(--white); z-index:1; }
+    .form-overlay-title { flex:1; font-size:1.05rem; font-weight:800; color:var(--dark); }
+    .form-overlay-close { background:none; border:none; font-size:1.25rem; cursor:pointer; color:var(--muted); padding:2px 7px; border-radius:7px; transition:all .15s; line-height:1; }
+    .form-overlay-close:hover { background:var(--light); color:var(--dark); }
+    .form-overlay-body { overflow-y:auto; padding:24px; flex:1; }
+    .fo-instructions { background:rgba(53,220,194,.06); border:1px solid rgba(53,220,194,.15); border-radius:10px; padding:12px 16px; font-size:.83rem; color:var(--dark); margin-bottom:20px; line-height:1.5; font-style:italic; }
+    .fo-section { margin-bottom:22px; }
+    .fo-section-title { font-size:.72rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--teal); margin-bottom:10px; padding-bottom:6px; border-bottom:1px solid var(--border); }
+    .fo-fields { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+    .fo-field  { display:flex; flex-direction:column; gap:4px; }
+    .fo-field.full { grid-column:1/-1; }
+    .fo-label  { font-size:.73rem; font-weight:600; color:var(--muted); }
+    .fo-req    { color:#e53e3e; margin-left:2px; }
+    .fo-input  { height:33px; background:var(--light); border:1.5px solid var(--border); border-radius:8px; display:flex; align-items:center; padding:0 10px; font-size:.77rem; color:#b0bac6; }
+    .fo-input.ta { height:54px; align-items:flex-start; padding-top:8px; }
+    .fo-radio-row { display:flex; flex-wrap:wrap; gap:6px; }
+    .fo-radio-opt { display:inline-flex; align-items:center; gap:5px; font-size:.75rem; color:var(--muted); }
+    .fo-radio-dot { width:14px; height:14px; border-radius:50%; border:1.5px solid var(--border); flex-shrink:0; }
+    .fo-check-col { display:flex; flex-direction:column; gap:5px; }
+    .fo-check-opt { display:inline-flex; align-items:center; gap:6px; font-size:.75rem; color:var(--muted); }
+    .fo-check-box { width:14px; height:14px; border-radius:3px; border:1.5px solid var(--border); flex-shrink:0; }
+    .fo-static    { background:var(--light); border-radius:8px; padding:10px 12px; font-size:.78rem; color:var(--muted); line-height:1.5; border:1px solid var(--border); }
+    .fo-scoring   { margin-top:14px; background:rgba(102,126,234,.05); border:1px solid rgba(102,126,234,.15); border-radius:10px; padding:14px 16px; }
+    .fo-scoring-title { font-size:.72rem; font-weight:700; color:#818cf8; text-transform:uppercase; letter-spacing:.06em; margin-bottom:8px; }
+    .fo-score-ranges  { display:flex; flex-wrap:wrap; gap:6px; }
+    .fo-score-range   { font-size:.72rem; padding:3px 10px; border-radius:20px; background:rgba(102,126,234,.08); color:#6366f1; border:1px solid rgba(102,126,234,.15); }
+
     /* ── EDIT CONTROLS ── */
     .section-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
     .section-header .section-label { margin-bottom:0; }
@@ -480,7 +522,7 @@
     <div class="step-line" id="line-2"></div>
     <div class="step">
       <div class="step-dot" id="dot-3">3</div>
-      <span class="step-label" id="lbl-3">Patient Intake</span>
+      <span class="step-label" id="lbl-3">Intake Forms</span>
     </div>
     <div class="step-line" id="line-3"></div>
     <div class="step">
@@ -531,28 +573,19 @@
       </div>
     </div>
 
-    <!-- STEP 3: Patient Intake & Screening -->
+    <!-- STEP 3: Intake Forms -->
     <div class="panel" id="panel-3">
-      <div class="ob-card">
-        <h2>Patient Intake &amp; Screening Setup</h2>
-        <p class="sub">Help Elevia route the right patients to this clinic. Answer one question at a time — press Skip for anything that doesn't apply.</p>
-
-        <!-- Progress -->
-        <div class="intake-progress-wrap">
-          <div class="intake-progress-bar">
-            <div class="intake-progress-fill" id="intake-progress-fill"></div>
-          </div>
-          <span class="intake-progress-label" id="intake-progress-label">Question 1 of 19</span>
-        </div>
-
-        <!-- Animated question -->
-        <div class="intake-question-card" id="intake-question-card"></div>
-
-        <!-- Nav -->
-        <div class="intake-nav">
-          <button class="btn btn-outline" id="intake-btn-prev" onclick="prevQuestion()" style="visibility:hidden">← Back</button>
-          <button class="btn-skip" id="intake-btn-skip" onclick="skipQuestion()">Skip</button>
-          <button class="btn btn-primary" id="intake-btn-next" onclick="nextQuestion()">Next →</button>
+      <div class="ob-card" style="padding:32px 40px">
+        <div class="section-label">Patient Intake Forms</div>
+        <h2 style="margin-bottom:8px">Select intake forms for this clinic</h2>
+        <p class="sub" style="margin-bottom:28px">Choose the forms patients will complete before their first appointment. All forms are pre-selected — deselect any that don't apply.</p>
+        <div id="forms-step-list"><div class="state-msg" style="padding:32px 0"><div class="spinner"></div><p>Loading forms…</p></div></div>
+      </div>
+      <div class="save-bar">
+        <div class="save-info"><strong id="forms-selected-count">0 forms selected</strong></div>
+        <div style="display:flex;gap:12px">
+          <button class="btn btn-outline" onclick="goStep(1)">← Start Over</button>
+          <button class="btn btn-primary" onclick="goToReviewStep()">Next: Review &amp; Confirm →</button>
         </div>
       </div>
     </div>
@@ -571,7 +604,8 @@
           <hr class="ob-divider"/>
           <div class="ob-section-label">Providers <span id="provider-count" style="font-size:.75rem;color:var(--muted);font-weight:400;margin-left:6px"></span></div>
           <div id="provider-list"></div>
-          <!-- intake summary injected here by renderIntakeSummary() -->
+          <!-- forms summary injected here by renderFormsSummaryInReview() -->
+          <div id="forms-review-block"></div>
         </div>
       </div>
 
@@ -606,6 +640,7 @@
         <div class="success-stats">
           <div class="sstat"><strong id="stat-providers">—</strong><span>Providers saved</span></div>
           <div class="sstat"><strong id="stat-clinic">—</strong><span>Clinic ID</span></div>
+          <div class="sstat"><strong id="stat-forms">—</strong><span>Forms linked</span></div>
         </div>
         <div style="display:flex;gap:12px;justify-content:center">
           <button class="btn btn-outline"  onclick="goHome()">← Back to Dashboard</button>
@@ -891,13 +926,20 @@ function showDetailNodePanel(d) {
 // ══════════════════════════════════════════════════════════
 let extracted        = null;
 let crawlAbort       = null;
-let intakeData       = {};
-let intakeIdx        = 0;
-let autoAdvanceTimer = null;
+// Intake forms state (replaces old per-question intake flow)
+let availableForms   = [];
+let selectedForms    = new Set();
+
+// ── DEMO MODE: Old intake Q&A disabled — replaced by Intake Forms step (step 3) ──
+// let intakeData       = {};
+// let intakeIdx        = 0;
+// let autoAdvanceTimer = null;
 
 // ══════════════════════════════════════════════════════════
-// INTAKE QUESTIONS (19 total)
+// INTAKE QUESTIONS (19 total) — DISABLED
+// Now using structured form schemas from resources/ via GET /forms on clinic-onboarder
 // ══════════════════════════════════════════════════════════
+/* DISABLED INTAKE_QUESTIONS
 const INTAKE_QUESTIONS = [
   { id:'telehealth', section:'Practice Info', type:'yn',
     question:'Does this clinic offer telehealth appointments?',
@@ -1020,10 +1062,12 @@ const INTAKE_QUESTIONS = [
     hint:'Optional. E.g. "Referral required", "Spanish-speaking therapist Mon–Wed", etc.',
     placeholder:'Free-text notes…' },
 ];
+END DISABLED INTAKE_QUESTIONS */
 
 // ══════════════════════════════════════════════════════════
-// INTAKE LOGIC
+// INTAKE LOGIC — DISABLED (replaced by Intake Forms step)
 // ══════════════════════════════════════════════════════════
+/* DISABLED INTAKE LOGIC
 function startIntake() {
   intakeIdx = 0;
   // Pre-populate from extracted data
@@ -1262,6 +1306,7 @@ function renderIntakeSummary() {
     </button>`;
   container.appendChild(block);
 }
+END DISABLED INTAKE LOGIC */
 
 // ══════════════════════════════════════════════════════════
 // ONBOARDER — Wizard flow
@@ -1288,55 +1333,78 @@ document.getElementById('btn-crawl').addEventListener('click', async () => {
     return;
   }
   goStep(2);
-  crawlAbort = new AbortController();
 
+  // ── DEMO MODE: AI extraction mocked — no live crawl API call ──
+  // Real crawl: await fetch('http://localhost:8002/crawl', { method:'POST', ... })
+  // Simulated loading animation (3 steps × ~1s each)
   const lsIds = ['ls-2','ls-3','ls-4'];
   let lsIdx = 0;
-  const lsTimer = setInterval(() => {
-    if (lsIdx > 0) {
-      const prev = document.getElementById(lsIds[lsIdx - 1]);
-      prev.classList.remove('active'); prev.classList.add('done');
-      prev.querySelector('.licon').textContent = '✓';
-    }
-    if (lsIdx < lsIds.length) { document.getElementById(lsIds[lsIdx]).classList.add('active'); lsIdx++; }
-    else clearInterval(lsTimer);
-  }, 8000);
+  await new Promise(resolve => {
+    const lsTimer = setInterval(() => {
+      if (lsIdx > 0) {
+        const prev = document.getElementById(lsIds[lsIdx - 1]);
+        prev.classList.remove('active'); prev.classList.add('done');
+        prev.querySelector('.licon').textContent = '✓';
+      }
+      if (lsIdx < lsIds.length) { document.getElementById(lsIds[lsIdx]).classList.add('active'); lsIdx++; }
+      else { clearInterval(lsTimer); resolve(); }
+    }, 900);
+  });
+  await new Promise(r => setTimeout(r, 400));
 
-  try {
-    const res = await fetch('http://localhost:8002/crawl', {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ clinic_name: name, website_url: url }),
-      signal: crawlAbort.signal,
-    });
-    clearInterval(lsTimer);
-    if (!res.ok) {
-      const err = await res.json();
-      goStep(1);
-      document.getElementById('step1-error').textContent   = err.detail || 'Extraction failed.';
-      document.getElementById('step1-error').style.display = 'block';
-      return;
-    }
-    extracted = await res.json();
-    if (extracted.error) {
-      goStep(1);
-      document.getElementById('step1-error').textContent   = extracted.error;
-      document.getElementById('step1-error').style.display = 'block';
-      return;
-    }
-    // Pre-render review (panel-4) content
-    renderTextView();
-    renderOnboardGraph();
-    updateSaveSummary();
-    // Go to intake (step 3)
-    startIntake();
-    goStep(3);
-  } catch (e) {
-    clearInterval(lsTimer);
-    if (e.name === 'AbortError') return;
-    goStep(1);
-    document.getElementById('step1-error').textContent   = 'Network error: ' + e.message;
-    document.getElementById('step1-error').style.display = 'block';
-  }
+  // Hardcoded fixture — CT Psychological & Assessment Center
+  extracted = {
+    clinic: {
+      name:      "CT Psychological & Assessment Center",
+      address:   "435 East Center Street, Manchester, CT 06040",
+      phone:     "(860) 643-2278",
+      email:     "",
+      website:   url || "https://ctpsychological.com",
+      specialties: [
+        "Adult Psychiatry","Child & Adolescent Psychiatry",
+        "Neuropsychological Testing","Psychotherapy",
+        "ADHD Evaluation","Anxiety & Depression","Trauma & PTSD",
+      ],
+    },
+    providers: [
+      {
+        name: "Dr. Sandra L. Moreno, PsyD", title: "Clinical Psychologist",
+        years_of_practice: 18, phone: "(860) 643-2278",
+        accepting_new_patients: true,
+        specializations: ["Trauma & PTSD","Anxiety","Depression","EMDR"],
+        description: "Dr. Moreno specialises in trauma-focused CBT and EMDR therapy for adults and adolescents. She is currently accepting new patients.",
+      },
+      {
+        name: "Dr. James R. Whitfield, MD", title: "Psychiatrist",
+        years_of_practice: 24, phone: "(860) 643-2278",
+        accepting_new_patients: true,
+        specializations: ["Bipolar Disorder","Schizophrenia","Medication Management","Adult Psychiatry"],
+        description: "Board-certified psychiatrist with over two decades of experience in complex mood and psychotic disorders.",
+      },
+      {
+        name: "Maya Chen, LCSW", title: "Licensed Clinical Social Worker",
+        years_of_practice: 11, phone: "(860) 643-2278",
+        accepting_new_patients: true,
+        specializations: ["Anxiety","Depression","Family Therapy","CBT","Adolescents"],
+        description: "Maya provides evidence-based therapy for individuals, couples, and families, with a focus on life transitions and relationship challenges.",
+      },
+      {
+        name: "Dr. Kevin O'Brien, PhD", title: "Child Psychologist",
+        years_of_practice: 15, phone: "(860) 643-2278",
+        accepting_new_patients: false,
+        specializations: ["ADHD","Autism Spectrum","Neuropsychological Testing","Child & Adolescent"],
+        description: "Dr. O'Brien conducts comprehensive psychological and neuropsychological evaluations for children and adolescents. Currently not accepting new patients.",
+      },
+    ],
+  };
+
+  // Pre-render review (panel-4) content
+  renderTextView();
+  renderOnboardGraph();
+  updateSaveSummary();
+  // Go to forms step (step 3)
+  await loadForms();
+  goStep(3);
 });
 
 function renderTextView() {
@@ -1503,7 +1571,12 @@ async function saveData() {
   try {
     const res = await fetch('http://localhost:8002/save', {
       method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ clinic: extracted.clinic, providers: extracted.providers, intake: extracted.intake || {} }),
+      body: JSON.stringify({
+        clinic:         extracted.clinic,
+        providers:      extracted.providers,
+        intake:         {},
+        selected_forms: [...selectedForms],
+      }),
     });
     const result = await res.json();
     if (!res.ok) {
@@ -1513,6 +1586,7 @@ async function saveData() {
     }
     document.getElementById('stat-providers').textContent = result.providers_saved;
     document.getElementById('stat-clinic').textContent    = '#' + result.clinic_id;
+    document.getElementById('stat-forms').textContent     = result.forms_linked || selectedForms.size;
     goStep(5);
   } catch (e) {
     alert('Network error: ' + e.message);
@@ -1527,8 +1601,8 @@ function cancelAndBack() {
 
 function restart() {
   extracted  = null;
-  intakeData = {};
-  intakeIdx  = 0;
+  availableForms = [];
+  selectedForms.clear();
   const nameEl = document.getElementById('clinic-name');
   const urlEl  = document.getElementById('clinic-url');
   if (nameEl) nameEl.value = '';
@@ -1536,8 +1610,10 @@ function restart() {
   const cfEl = document.getElementById('clinic-fields'), plEl = document.getElementById('provider-list');
   if (cfEl) cfEl.innerHTML = '';
   if (plEl) plEl.innerHTML = '';
-  const existing = document.getElementById('intake-summary-block');
-  if (existing) existing.remove();
+  const frEl = document.getElementById('forms-review-block');
+  if (frEl) frEl.innerHTML = '';
+  const fsList = document.getElementById('forms-step-list');
+  if (fsList) fsList.innerHTML = '<div class="state-msg" style="padding:32px 0"><div class="spinner"></div><p>Loading forms…</p></div>';
   const errEl = document.getElementById('step1-error');
   if (errEl) errEl.style.display = 'none';
   const saveBtn = document.getElementById('btn-save');
@@ -1548,6 +1624,180 @@ function restart() {
   });
   showReviewTab('text');
   goStep(1);
+}
+
+// ══════════════════════════════════════════════════════════
+// INTAKE FORMS STEP (step 3)
+// ══════════════════════════════════════════════════════════
+async function loadForms() {
+  try {
+    const res = await fetch('http://localhost:8002/forms');
+    if (!res.ok) throw new Error('Could not load forms');
+    availableForms = await res.json();
+    selectedForms.clear();
+    availableForms.forEach(f => selectedForms.add(f.form_id));
+  } catch (e) {
+    availableForms = [];
+  }
+  renderFormsStep();
+}
+
+function renderFormsStep() {
+  const container = document.getElementById('forms-step-list');
+  if (!container) return;
+  if (!availableForms.length) {
+    container.innerHTML = '<div class="state-msg" style="padding:24px 0;color:var(--muted)">No intake forms available. Check that the clinic-onboarder service is running on port 8002.</div>';
+    return;
+  }
+  container.innerHTML = '';
+  const grid = document.createElement('div');
+  grid.className = 'forms-grid';
+
+  availableForms.forEach(form => {
+    const sel  = selectedForms.has(form.form_id);
+    const card = document.createElement('div');
+    card.className = 'form-card' + (sel ? ' selected' : '');
+    card.dataset.formId = form.form_id;
+    card.innerHTML = `
+      <div class="form-card-thumb" onclick="openFormOverlay('${esc(form.form_id)}')">
+        <div class="form-mini-inner" id="fmi-${esc(form.form_id)}"></div>
+        <div class="fc-hint">Click to expand ↗</div>
+      </div>
+      <div class="form-card-footer">
+        <div class="form-card-name" title="${esc(form.title)}">${esc(form.title)}</div>
+        <input class="form-card-cb" type="checkbox" ${sel ? 'checked' : ''}
+               onchange="toggleFormCard('${esc(form.form_id)}', this.checked)"/>
+      </div>`;
+    grid.appendChild(card);
+  });
+
+  container.appendChild(grid);
+  availableForms.forEach(form => {
+    const mini = document.getElementById('fmi-' + form.form_id);
+    if (mini) mini.innerHTML = renderMiniFormHtml(form);
+  });
+  updateFormsCount();
+}
+
+function toggleFormCard(fid, checked) {
+  checked ? selectedForms.add(fid) : selectedForms.delete(fid);
+  const card = document.querySelector(`.form-card[data-form-id="${fid}"]`);
+  if (card) card.classList.toggle('selected', checked);
+  updateFormsCount();
+}
+
+function updateFormsCount() {
+  const el = document.getElementById('forms-selected-count');
+  if (el) el.textContent = selectedForms.size + ' form' + (selectedForms.size !== 1 ? 's' : '') + ' selected';
+}
+
+// ── Form overlay ──────────────────────────────────────────
+function openFormOverlay(fid) {
+  const form = availableForms.find(f => f.form_id === fid);
+  if (!form) return;
+  document.getElementById('form-overlay-title').textContent = form.title;
+  document.getElementById('form-overlay-body').innerHTML = renderFormFull(form);
+  document.getElementById('form-overlay').classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+}
+function closeFormOverlay() {
+  document.getElementById('form-overlay').classList.add('hidden');
+  document.body.style.overflow = '';
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeFormOverlay(); });
+
+function renderFormFull(form) {
+  let h = '';
+  if (form.instructions) h += `<div class="fo-instructions">${esc(form.instructions)}</div>`;
+  (form.sections || []).forEach(sec => {
+    h += `<div class="fo-section"><div class="fo-section-title">${esc(sec.title || '')}${sec.optional ? ' <span style="font-weight:400;color:var(--muted)">(Optional)</span>' : ''}</div><div class="fo-fields">`;
+    (sec.fields || []).forEach(f => {
+      const req  = f.required ? '<span class="fo-req">*</span>' : '';
+      const full = ['textarea','static_text','checkbox','signature'].includes(f.type) ? ' full' : '';
+      h += `<div class="fo-field${full}"><div class="fo-label">${esc(f.label || '')}${req}</div>`;
+      if (f.type === 'text' || f.type === 'email' || f.type === 'date' || f.type === 'time') {
+        const ph = f.type==='date' ? 'MM / DD / YYYY' : f.type==='email' ? 'email@example.com' : '';
+        h += `<div class="fo-input">${esc(ph)}</div>`;
+      } else if (f.type === 'select') {
+        h += `<div class="fo-input">${esc((f.options||[])[0]||'')} ▾</div>`;
+      } else if (f.type === 'textarea') {
+        h += `<div class="fo-input ta">Free text…</div>`;
+      } else if (f.type === 'radio') {
+        const scale = form.scale || [];
+        h += `<div class="fo-radio-row">` +
+          (f.options||[]).map(o => { const s=scale.find(x=>String(x.value)===o); return `<span class="fo-radio-opt"><span class="fo-radio-dot"></span>${esc(s?s.label:o)}</span>`; }).join('') + `</div>`;
+      } else if (f.type === 'checkbox') {
+        h += `<div class="fo-check-col">` + (f.options||[]).map(o=>`<span class="fo-check-opt"><span class="fo-check-box"></span>${esc(o)}</span>`).join('') + `</div>`;
+      } else if (f.type === 'static_text') {
+        h += `<div class="fo-static">${esc(f.value || '')}</div>`;
+      } else if (f.type === 'signature') {
+        h += `<div class="fo-input" style="font-style:italic;color:#b0bac6">✍ Digital signature</div>`;
+      }
+      h += `</div>`;
+    });
+    h += `</div></div>`;
+  });
+  if (form.scoring) {
+    h += `<div class="fo-scoring"><div class="fo-scoring-title">Scoring</div><div class="fo-score-ranges">` +
+      (form.scoring.ranges||[]).map(r=>`<span class="fo-score-range">${r.min}–${r.max}: ${esc(r.label)}</span>`).join('') + `</div></div>`;
+  }
+  return h;
+}
+
+function renderMiniFormHtml(form) {
+  let h = `<div style="font-size:14px;font-weight:700;color:#1a2b3c;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid #e2e8f0">${esc(form.title)}</div>`;
+  if (form.instructions) h += `<div style="font-size:10px;color:#718096;margin-bottom:12px;line-height:1.45;font-style:italic;padding:6px 8px;background:#f0faf8;border-radius:4px">${esc(form.instructions.substring(0,140))}${form.instructions.length>140?'…':''}</div>`;
+  (form.sections||[]).forEach(sec => {
+    if (sec.title) h += `<div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#35dcc2;margin:12px 0 6px">${esc(sec.title)}</div>`;
+    h += `<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">`;
+    (sec.fields||[]).forEach(f => {
+      const full = ['textarea','static_text','checkbox','signature'].includes(f.type);
+      h += `<div style="grid-column:${full?'1/-1':'auto'}">`;
+      h += `<div style="font-size:9px;font-weight:600;color:#718096;margin-bottom:2px">${esc(f.label||'')}${f.required?' *':''}</div>`;
+      if (f.type==='static_text') {
+        h += `<div style="font-size:9px;color:#a0aec0;line-height:1.3;background:#f8fafc;padding:4px 6px;border-radius:3px;border:1px solid #e2e8f0">${esc((f.value||'').substring(0,100))}${(f.value||'').length>100?'…':''}</div>`;
+      } else if (f.type==='radio') {
+        const scale=form.scale||[];
+        h += `<div style="display:flex;flex-wrap:wrap;gap:3px">` +
+          (f.options||[]).slice(0,5).map(o=>{const s=scale.find(x=>String(x.value)===o);return `<span style="display:inline-flex;align-items:center;gap:3px;font-size:8px;color:#718096"><span style="width:9px;height:9px;border-radius:50%;border:1.5px solid #cbd5e0;display:inline-block;flex-shrink:0"></span>${esc(s?s.label:o)}</span>`;}).join('') + `</div>`;
+      } else if (f.type==='checkbox') {
+        h += `<div style="display:flex;flex-direction:column;gap:2px">` +
+          (f.options||[]).slice(0,3).map(o=>`<span style="display:inline-flex;align-items:center;gap:3px;font-size:8px;color:#718096"><span style="width:9px;height:9px;border-radius:2px;border:1.5px solid #cbd5e0;display:inline-block;flex-shrink:0"></span>${esc(o)}</span>`).join('') + `</div>`;
+      } else if (f.type==='textarea') {
+        h += `<div style="height:32px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:4px;padding:4px 6px;font-size:8px;color:#a0aec0">Free text…</div>`;
+      } else if (f.type==='signature') {
+        h += `<div style="height:24px;background:#f8fafc;border:1px dashed #cbd5e0;border-radius:4px;display:flex;align-items:center;padding:0 6px;font-size:8px;font-style:italic;color:#a0aec0">✍ Sign here</div>`;
+      } else if (f.type==='select') {
+        h += `<div style="height:24px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:4px;display:flex;align-items:center;justify-content:space-between;padding:0 6px"><span style="font-size:8px;color:#a0aec0">${esc((f.options||[])[0]||'Select…')}</span><span style="font-size:7px;color:#a0aec0">▾</span></div>`;
+      } else {
+        const ph = f.type==='date'?'MM/DD/YYYY':f.type==='email'?'email@example.com':'';
+        h += `<div style="height:24px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:4px;padding:0 6px;display:flex;align-items:center;font-size:8px;color:#a0aec0">${esc(ph)}</div>`;
+      }
+      h += `</div>`;
+    });
+    h += `</div>`;
+  });
+  return h;
+}
+
+function goToReviewStep() {
+  renderFormsSummaryInReview();
+  goStep(4);
+  showReviewTab('text');
+}
+
+function renderFormsSummaryInReview() {
+  const block = document.getElementById('forms-review-block');
+  if (!block) return;
+  const chosen = availableForms.filter(f => selectedForms.has(f.form_id));
+  if (!chosen.length) { block.innerHTML = ''; return; }
+  const chips = chosen.map(f => `<span class="chip-tag" style="background:rgba(99,102,241,.12);color:#4338ca;border-color:rgba(99,102,241,.25)">${esc(f.title)}</span>`).join(' ');
+  block.innerHTML = `
+    <div class="intake-summary-section">
+      <div class="ob-section-label" style="margin-top:4px">Patient Intake Forms</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 12px">${chips}</div>
+      <button class="btn btn-outline" style="font-size:.82rem" onclick="goStep(3)">✏️ Edit Form Selection</button>
+    </div>`;
 }
 
 // ══════════════════════════════════════════════════════════
@@ -2023,6 +2273,17 @@ function renderModalAnswer(r) {
       <span class="modal-footer-left" id="intake-modal-footer-hint"></span>
       <div class="modal-footer-right" id="intake-modal-footer-actions"></div>
     </div>
+  </div>
+</div>
+
+<!-- Form full-view overlay -->
+<div class="form-overlay hidden" id="form-overlay" onclick="if(event.target===this)closeFormOverlay()">
+  <div class="form-overlay-box">
+    <div class="form-overlay-hdr">
+      <div class="form-overlay-title" id="form-overlay-title"></div>
+      <button class="form-overlay-close" onclick="closeFormOverlay()">✕</button>
+    </div>
+    <div class="form-overlay-body" id="form-overlay-body"></div>
   </div>
 </div>
 

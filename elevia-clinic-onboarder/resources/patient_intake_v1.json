@@ -1,0 +1,62 @@
+{
+  "form_id": "patient_intake_v1",
+  "title": "Patient Intake Appointment Form",
+  "sections": [
+    {
+      "title": "Personal Information",
+      "fields": [
+        {"type": "text",     "label": "Full Name",     "required": true},
+        {"type": "date",     "label": "Date of Birth", "required": true},
+        {"type": "select",   "label": "Gender",        "options": ["Male", "Female", "Other", "Prefer not to say"]},
+        {"type": "text",     "label": "Phone Number",  "required": true},
+        {"type": "email",    "label": "Email Address"},
+        {"type": "textarea", "label": "Address"}
+      ]
+    },
+    {
+      "title": "Emergency Contact",
+      "fields": [
+        {"type": "text", "label": "Name"},
+        {"type": "text", "label": "Relationship"},
+        {"type": "text", "label": "Phone Number"}
+      ]
+    },
+    {
+      "title": "Appointment Details",
+      "fields": [
+        {"type": "date",     "label": "Preferred Date"},
+        {"type": "time",     "label": "Preferred Time"},
+        {"type": "textarea", "label": "Reason for Visit"},
+        {
+          "type": "select",
+          "label": "Type of Service",
+          "options": ["Psychiatry", "Counselling", "Family Therapy"]
+        }
+      ]
+    },
+    {
+      "title": "Medical Background",
+      "fields": [
+        {"type": "textarea", "label": "Current Medications"},
+        {"type": "textarea", "label": "Past Diagnoses"},
+        {"type": "textarea", "label": "Allergies"},
+        {"type": "text",     "label": "Primary Care Physician"}
+      ]
+    },
+    {
+      "title": "Insurance",
+      "optional": true,
+      "fields": [
+        {"type": "text", "label": "Provider"},
+        {"type": "text", "label": "Policy Number"}
+      ]
+    }
+  ],
+  "metadata": {
+    "form_id": "patient_intake_v1",
+    "tags": ["intake", "appointment", "general"],
+    "medical_areas": ["Psychiatry", "Counselling", "Family Therapy", "Internal Medicine"],
+    "description": "Initial intake form for new patients including demographics, medical history, and appointment preferences",
+    "embedding_text": "patient intake appointment form new patient demographics personal information emergency contact medical history medications diagnoses allergies insurance psychiatry counselling family therapy"
+  }
+}

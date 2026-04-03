@@ -180,6 +180,104 @@
     }
     .graph-hint { text-align:center; font-size:.8rem; color:var(--muted); margin-top:8px; }
 
+    /* ── INTAKE FORMS CARD GRID ── */
+    .forms-grid {
+      display:grid; grid-template-columns:repeat(auto-fill,minmax(210px,1fr)); gap:18px;
+    }
+
+    .form-card {
+      border:2px solid var(--border); border-radius:14px; overflow:hidden;
+      background:var(--white); transition:border-color .2s,box-shadow .2s,transform .15s;
+    }
+    .form-card:hover { transform:translateY(-3px); box-shadow:0 10px 32px rgba(53,220,194,.14); border-color:#b2e8e0; }
+    .form-card.selected { border-color:var(--teal); box-shadow:0 0 0 3px rgba(53,220,194,.12); }
+
+    /* Thumbnail area */
+    .form-card-thumb {
+      height:190px; overflow:hidden; background:#f8fafc;
+      border-bottom:1px solid var(--border); position:relative; cursor:pointer;
+    }
+    .form-card-thumb:hover .fc-hint { opacity:1; }
+    .fc-hint {
+      position:absolute; inset:0; background:rgba(15,33,55,.42);
+      display:flex; align-items:center; justify-content:center;
+      color:#fff; font-size:.78rem; font-weight:700; letter-spacing:.04em;
+      opacity:0; transition:opacity .2s; backdrop-filter:blur(2px);
+    }
+    .form-mini-inner {
+      width:640px; transform:scale(0.322); transform-origin:top left;
+      pointer-events:none; padding:20px 24px; background:#fff; font-family:'Inter',sans-serif;
+    }
+
+    /* Card footer */
+    .form-card-footer {
+      display:flex; align-items:center; gap:10px; padding:11px 14px;
+      border-top:1px solid var(--border); background:var(--white);
+    }
+    .form-card-name {
+      flex:1; font-size:.84rem; font-weight:700; color:var(--dark);
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    }
+    .form-card-cb { width:20px; height:20px; accent-color:var(--teal); cursor:pointer; flex-shrink:0; }
+
+    /* Full-form overlay */
+    .form-overlay {
+      position:fixed; inset:0; z-index:300; background:rgba(15,33,55,.52);
+      display:flex; align-items:center; justify-content:center; padding:20px;
+    }
+    .form-overlay.hidden { display:none; }
+    .form-overlay-box {
+      background:var(--white); border-radius:18px; width:100%; max-width:660px;
+      max-height:88vh; overflow:hidden; display:flex; flex-direction:column;
+      box-shadow:0 24px 80px rgba(0,0,0,.35);
+    }
+    .form-overlay-hdr {
+      padding:18px 24px 14px; border-bottom:1px solid var(--border);
+      display:flex; align-items:center; gap:12px; flex-shrink:0;
+      position:sticky; top:0; background:var(--white); z-index:1;
+    }
+    .form-overlay-title { flex:1; font-size:1.05rem; font-weight:800; color:var(--dark); }
+    .form-overlay-close {
+      background:none; border:none; font-size:1.25rem; cursor:pointer;
+      color:var(--muted); padding:2px 7px; border-radius:7px; transition:all .15s; line-height:1;
+    }
+    .form-overlay-close:hover { background:var(--light); color:var(--dark); }
+    .form-overlay-body { overflow-y:auto; padding:24px; flex:1; }
+
+    /* Overlay form content */
+    .fo-instructions {
+      background:rgba(53,220,194,.06); border:1px solid rgba(53,220,194,.15);
+      border-radius:10px; padding:12px 16px; font-size:.83rem;
+      color:var(--dark); margin-bottom:20px; line-height:1.5; font-style:italic;
+    }
+    .fo-section { margin-bottom:22px; }
+    .fo-section-title {
+      font-size:.72rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase;
+      color:var(--teal); margin-bottom:10px; padding-bottom:6px; border-bottom:1px solid var(--border);
+    }
+    .fo-fields { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+    .fo-field  { display:flex; flex-direction:column; gap:4px; }
+    .fo-field.full { grid-column:1/-1; }
+    .fo-label  { font-size:.73rem; font-weight:600; color:var(--muted); }
+    .fo-req    { color:#e53e3e; margin-left:2px; }
+    .fo-input  {
+      height:33px; background:var(--light); border:1.5px solid var(--border);
+      border-radius:8px; display:flex; align-items:center; padding:0 10px;
+      font-size:.77rem; color:#b0bac6;
+    }
+    .fo-input.ta  { height:54px; align-items:flex-start; padding-top:8px; }
+    .fo-radio-row { display:flex; flex-wrap:wrap; gap:6px; }
+    .fo-radio-opt { display:inline-flex; align-items:center; gap:5px; font-size:.75rem; color:var(--muted); }
+    .fo-radio-dot { width:14px; height:14px; border-radius:50%; border:1.5px solid var(--border); flex-shrink:0; }
+    .fo-check-col { display:flex; flex-direction:column; gap:5px; }
+    .fo-check-opt { display:inline-flex; align-items:center; gap:6px; font-size:.75rem; color:var(--muted); }
+    .fo-check-box { width:14px; height:14px; border-radius:3px; border:1.5px solid var(--border); flex-shrink:0; }
+    .fo-static    { background:var(--light); border-radius:8px; padding:10px 12px; font-size:.78rem; color:var(--muted); line-height:1.5; border:1px solid var(--border); }
+    .fo-scoring   { margin-top:14px; background:rgba(102,126,234,.05); border:1px solid rgba(102,126,234,.15); border-radius:10px; padding:14px 16px; }
+    .fo-scoring-title { font-size:.72rem; font-weight:700; color:#818cf8; text-transform:uppercase; letter-spacing:.06em; margin-bottom:8px; }
+    .fo-score-ranges  { display:flex; flex-wrap:wrap; gap:6px; }
+    .fo-score-range   { font-size:.72rem; padding:3px 10px; border-radius:20px; background:rgba(102,126,234,.08); color:#6366f1; border:1px solid rgba(102,126,234,.15); }
+
     /* ── SAVE BAR ── */
     .save-bar {
       background:var(--white); border-top:1px solid var(--border);
@@ -235,12 +333,17 @@
   <div class="step-line" id="line-2"></div>
   <div class="step">
     <div class="step-dot" id="dot-3">3</div>
-    <span class="step-label" id="lbl-3">Review &amp; Confirm</span>
+    <span class="step-label" id="lbl-3">Review &amp; Edit</span>
   </div>
   <div class="step-line" id="line-3"></div>
   <div class="step">
     <div class="step-dot" id="dot-4">4</div>
-    <span class="step-label" id="lbl-4">Saved</span>
+    <span class="step-label" id="lbl-4">Intake Forms</span>
+  </div>
+  <div class="step-line" id="line-4"></div>
+  <div class="step">
+    <div class="step-dot" id="dot-5">5</div>
+    <span class="step-label" id="lbl-5">Saved</span>
   </div>
 </div>
 
@@ -323,27 +426,55 @@
     </div>
   </div>
 
-  <!-- Save bar -->
+  <!-- Next bar (step 3 → step 4) -->
   <div class="save-bar">
     <div class="save-info">
-      <strong id="save-summary">Review the data above before saving.</strong><br/>
+      <strong id="save-summary">Review the data above before continuing.</strong><br/>
       Changes made in the text view will be saved.
     </div>
     <div style="display:flex;gap:12px">
       <button class="btn btn-outline" onclick="restart()">← Back</button>
-      <button class="btn btn-primary" id="btn-save" onclick="saveData()">
-        ✓ Confirm &amp; Save to Database
+      <button class="btn btn-primary" onclick="goToFormsStep()">
+        Next: Intake Forms →
       </button>
     </div>
   </div>
 </div>
 
-<!-- ── STEP 4: Saved ─────────────────────────────── -->
+<!-- ── STEP 4: Patient Intake Forms ──────────────── -->
 <div class="panel" id="panel-4">
+  <div class="card" style="padding:32px 40px">
+    <div class="section-label">Patient Intake Forms</div>
+    <h2 style="margin-bottom:8px">Select intake forms for this clinic</h2>
+    <p style="color:var(--muted);font-size:.88rem;line-height:1.65;margin-bottom:28px">
+      These forms will be linked to the clinic and shown to patients during intake.
+      Selected forms are indexed in the AI knowledge base for intelligent agent retrieval.
+      All forms are selected by default.
+    </p>
+    <div id="forms-step-list">
+      <p style="color:var(--muted);font-size:.85rem">Loading forms…</p>
+    </div>
+  </div>
+  <div class="save-bar">
+    <div class="save-info">
+      <strong id="forms-selected-count">0 forms selected</strong><br/>
+      Selected forms are linked to the clinic and indexed for AI retrieval.
+    </div>
+    <div style="display:flex;gap:12px">
+      <button class="btn btn-outline" onclick="goStep(3)">← Back</button>
+      <button class="btn btn-primary" id="btn-save" onclick="saveData()">
+        ✓ Save to Database
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ── STEP 5: Saved ─────────────────────────────── -->
+<div class="panel" id="panel-5">
   <div class="card success-card">
     <div class="success-icon">🎉</div>
     <h2>Clinic Onboarded Successfully!</h2>
-    <p>The clinic and all provider profiles have been saved to the Elevia Platform database and are now discoverable by patients.</p>
+    <p>The clinic, providers, and intake forms have been saved to the Elevia Platform and are now discoverable by patients.</p>
     <div class="success-stats">
       <div class="sstat">
         <strong id="stat-providers">—</strong>
@@ -352,6 +483,10 @@
       <div class="sstat">
         <strong id="stat-clinic">—</strong>
         <span>Clinic ID</span>
+      </div>
+      <div class="sstat">
+        <strong id="stat-forms">—</strong>
+        <span>Forms linked</span>
       </div>
     </div>
     <button class="btn btn-primary" onclick="restart()">+ Onboard Another Clinic</button>
@@ -362,24 +497,32 @@
 
 <script>
 // ── State ─────────────────────────────────────────────────
-let extracted = null;   // { clinic: {}, providers: [] }
-let crawlAbort = null;  // AbortController for the in-flight crawl request
+let extracted      = null;  // { clinic: {}, providers: [] }
+let crawlAbort     = null;  // AbortController for the in-flight crawl request
+let availableForms = [];    // forms fetched from /forms
+let selectedForms  = new Set();
 
 // ── Step nav helpers ──────────────────────────────────────
+const TOTAL_STEPS = 5;
 function goStep(n) {
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   document.getElementById('panel-' + n).classList.add('active');
-
-  for (let i = 1; i <= 4; i++) {
+  for (let i = 1; i <= TOTAL_STEPS; i++) {
     const dot = document.getElementById('dot-' + i);
     const lbl = document.getElementById('lbl-' + i);
     dot.classList.toggle('done',   i < n);
     dot.classList.toggle('active', i === n);
     lbl.classList.toggle('active', i === n);
-    if (i < 4) {
+    if (i < TOTAL_STEPS) {
       document.getElementById('line-' + i).classList.toggle('done', i < n);
     }
   }
+}
+
+function goToFormsStep() {
+  collectEdits();
+  goStep(4);
+  renderFormsStep();
 }
 
 // ── Step 1 → 2 → 3 ───────────────────────────────────────
@@ -397,9 +540,11 @@ document.getElementById('btn-crawl').addEventListener('click', async () => {
 
   goStep(2);
 
-  crawlAbort = new AbortController();
+  // ── DEMO MODE: AI extraction mocked — no crawl API call ──
+  // Real crawl: await fetch('/crawl', ...) — commented out to save tokens
+  // crawlAbort = new AbortController();
 
-  // Animate loading steps
+  // Animate loading steps (simulate extraction delay)
   const lsIds = ['ls-2','ls-3','ls-4'];
   let lsIdx = 0;
   const lsTimer = setInterval(() => {
@@ -411,48 +556,72 @@ document.getElementById('btn-crawl').addEventListener('click', async () => {
     if (lsIdx < lsIds.length) {
       document.getElementById(lsIds[lsIdx]).classList.add('active');
       lsIdx++;
-    } else {
-      clearInterval(lsTimer);
-    }
-  }, 8000);
+    } else { clearInterval(lsTimer); }
+  }, 900);
 
-  try {
-    const res  = await fetch('/crawl', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ clinic_name: name, website_url: url }),
-      signal: crawlAbort.signal,
-    });
-    clearInterval(lsTimer);
+  await new Promise(r => setTimeout(r, 3200));
+  clearInterval(lsTimer);
+  lsIds.forEach(id => {
+    const el = document.getElementById(id);
+    el.classList.remove('active'); el.classList.add('done');
+    el.querySelector('.licon').textContent = '✓';
+  });
 
-    if (!res.ok) {
-      const err = await res.json();
-      goStep(1);
-      document.getElementById('step1-error').textContent = err.detail || 'Extraction failed.';
-      document.getElementById('step1-error').style.display = 'block';
-      return;
-    }
+  // Hardcoded fixture: CT Psychological & Assessment Center
+  extracted = {
+    clinic: {
+      name:      "CT Psychological & Assessment Center",
+      address:   "435 East Center Street, Manchester, CT 06040",
+      phone:     "(860) 643-2278",
+      email:     "info@ctpsychological.com",
+      website:   "https://www.ctpsychological.com",
+      specialties: ["Adult Psychiatry", "Child & Adolescent Psychiatry", "Neuropsychological Testing", "Psychotherapy", "ADHD Evaluation", "Anxiety & Depression", "Trauma & PTSD"],
+    },
+    providers: [
+      {
+        name: "Dr. Sandra L. Moreno, PsyD",
+        title: "Clinical Psychologist",
+        years_of_practice: 18,
+        specializations: ["Neuropsychological Assessment", "Adult ADHD", "Anxiety Disorders"],
+        accepting_new_patients: true,
+        phone: "(860) 643-2278 ext. 101",
+        description: "Dr. Moreno specialises in comprehensive neuropsychological evaluations and evidence-based treatment for adults with attention, memory, and executive function difficulties.",
+      },
+      {
+        name: "Dr. James R. Whitfield, MD",
+        title: "Psychiatrist",
+        years_of_practice: 24,
+        specializations: ["Medication Management", "Treatment-Resistant Depression", "Bipolar Disorder"],
+        accepting_new_patients: true,
+        phone: "(860) 643-2278 ext. 102",
+        description: "Board-certified psychiatrist with over two decades of experience in pharmacological management of mood and psychotic disorders.",
+      },
+      {
+        name: "Maya Chen, LCSW",
+        title: "Licensed Clinical Social Worker",
+        years_of_practice: 11,
+        specializations: ["Trauma & PTSD", "DBT", "Family Therapy", "Adolescents"],
+        accepting_new_patients: true,
+        phone: "(860) 643-2278 ext. 103",
+        description: "Maya provides trauma-focused therapy using EMDR and DBT frameworks, with a special interest in adolescent and young-adult populations navigating life transitions.",
+      },
+      {
+        name: "Dr. Kevin O'Brien, PhD",
+        title: "Child Psychologist",
+        years_of_practice: 15,
+        specializations: ["Child & Adolescent Assessment", "Learning Disabilities", "Autism Spectrum"],
+        accepting_new_patients: false,
+        phone: "(860) 643-2278 ext. 104",
+        description: "Dr. O'Brien conducts psychoeducational and autism-spectrum evaluations for children ages 4–18 and consults with schools on individualized education plans.",
+      },
+    ],
+  };
 
-    extracted = await res.json();
-    if (extracted.error) {
-      goStep(1);
-      document.getElementById('step1-error').textContent = extracted.error;
-      document.getElementById('step1-error').style.display = 'block';
-      return;
-    }
-
-    renderTextView();
-    renderGraph();
-    updateSaveSummary();
-    goStep(3);
-
-  } catch (e) {
-    clearInterval(lsTimer);
-    if (e.name === 'AbortError') return;  // user clicked Back — silent
-    goStep(1);
-    document.getElementById('step1-error').textContent = 'Network error: ' + e.message;
-    document.getElementById('step1-error').style.display = 'block';
-  }
+  renderTextView();
+  renderGraph();
+  updateSaveSummary();
+  loadForms();
+  goStep(3);
 });
 
 // ── Render: Text View ─────────────────────────────────────
@@ -485,6 +654,15 @@ function renderTextView() {
     <div class="chips-edit">${specs.map(s => `<span class="chip-tag">${escHtml(s)}</span>`).join('')}</div>
     <input data-field="clinic.specialties" value="${escHtml(specs.join(', '))}" placeholder="comma-separated" style="margin-top:8px"/>`;
   clinicFields.appendChild(specsDiv);
+
+  // Selected forms display
+  const formsDiv = document.createElement('div');
+  formsDiv.className = 'attr-item full';
+  formsDiv.innerHTML = `<label>Patient Intake Forms</label>
+    <div class="chips-edit" id="text-forms-chips">
+      <span style="color:var(--muted);font-size:.82rem">No forms selected — choose in the Intake Forms tab.</span>
+    </div>`;
+  clinicFields.appendChild(formsDiv);
 
   // Providers
   const provList = document.getElementById('provider-list');
@@ -579,15 +757,28 @@ function renderGraph() {
   gradProv.append('stop').attr('offset','0%').attr('stop-color','#4f8ef7');
   gradProv.append('stop').attr('offset','100%').attr('stop-color','#6ecfb0');
 
+  const gradForm = defs.append('linearGradient').attr('id','formGrad')
+    .attr('x1','0%').attr('y1','0%').attr('x2','100%').attr('y2','100%');
+  gradForm.append('stop').attr('offset','0%').attr('stop-color','#a78bfa');
+  gradForm.append('stop').attr('offset','100%').attr('stop-color','#7c3aed');
+
   // Nodes + links
   const c = extracted.clinic || {};
-  const providers = extracted.providers || [];
+  const providers  = extracted.providers || [];
+  const formNodes  = [...selectedForms].map((fid, i) => {
+    const f = availableForms.find(x => x.form_id === fid) || { title: fid };
+    return { id: `form${i}`, type: 'form', data: f };
+  });
 
   const nodes = [
     { id:'clinic', type:'clinic', data: c },
     ...providers.map((p, i) => ({ id:`p${i}`, type:'provider', data: p })),
+    ...formNodes,
   ];
-  const links = providers.map((_, i) => ({ source:'clinic', target:`p${i}` }));
+  const links = [
+    ...providers.map((_, i) => ({ source:'clinic', target:`p${i}` })),
+    ...formNodes.map(f   => ({ source:'clinic', target:f.id, formLink: true })),
+  ];
 
   const zoomG = svg.append('g');
 
@@ -603,7 +794,8 @@ function renderGraph() {
 
   // Links
   const link = zoomG.append('g').selectAll('line').data(links).join('line')
-    .attr('stroke', '#c8e6e0').attr('stroke-width', 2).attr('stroke-dasharray', '5 4');
+    .attr('stroke', d => d.formLink ? '#c4b5fd' : '#c8e6e0')
+    .attr('stroke-width', 2).attr('stroke-dasharray', d => d.formLink ? '4 3' : '5 4');
 
   // Node groups
   const node = zoomG.append('g').selectAll('g').data(nodes).join('g')
@@ -616,8 +808,8 @@ function renderGraph() {
 
   // Circles
   node.append('circle')
-    .attr('r', d => d.type === 'clinic' ? 52 : 36)
-    .attr('fill', d => d.type === 'clinic' ? 'url(#nodeGrad)' : 'url(#provGrad)')
+    .attr('r', d => d.type === 'clinic' ? 52 : d.type === 'form' ? 30 : 36)
+    .attr('fill', d => d.type === 'clinic' ? 'url(#nodeGrad)' : d.type === 'form' ? 'url(#formGrad)' : 'url(#provGrad)')
     .attr('stroke', '#fff').attr('stroke-width', 3)
     .attr('filter', 'drop-shadow(0 4px 12px rgba(53,220,194,.3))');
 
@@ -642,6 +834,14 @@ function renderGraph() {
         lines.forEach((ln, li) => {
           el.append('tspan').attr('x', 0).attr('dy', li === 0 ? offset : 14).text(ln);
         });
+      } else if (d.type === 'form') {
+        el.attr('font-size', '10px');
+        const formIconMap = { patient_intake_v1: '📋', hipaa_ack_v1: '🔒', phq9_v1: '🧠' };
+        const ico   = formIconMap[d.data.form_id] || '📄';
+        const label = (d.data.title || 'Form').replace(/form$/i,'').trim();
+        const short = label.length > 11 ? label.slice(0, 10) + '…' : label;
+        el.append('tspan').attr('x', 0).attr('dy', '-6').text(ico);
+        el.append('tspan').attr('x', 0).attr('dy', '14').text(short);
       } else {
         el.attr('font-size', '10px');
         const name = d.data.name || 'Provider';
@@ -665,12 +865,18 @@ function showDetail(d) {
   const isClinic = d.type === 'clinic';
 
   const chips = arr => (arr || []).map(s => `<span class="dp-chip">${escHtml(s)}</span>`).join('');
+  const isForm   = d.type === 'form';
 
   let html = `
-    <div class="dp-title">${escHtml(isClinic ? data.name : data.name) || '—'}</div>
-    <div class="dp-type">${isClinic ? '🏥 Clinic' : '🧑‍⚕️ Provider'}</div>`;
+    <div class="dp-title">${escHtml(data.name || data.title) || '—'}</div>
+    <div class="dp-type">${isClinic ? '🏥 Clinic' : isForm ? '📄 Intake Form' : '🧑‍⚕️ Provider'}</div>`;
 
-  if (isClinic) {
+  if (isForm) {
+    html += row('Form ID',      data.form_id);
+    html += row('Description',  data.description);
+    if (data.tags?.length)        html += `<div class="dp-row"><span class="dp-label">Tags</span><div>${chips(data.tags)}</div></div>`;
+    if (data.medical_areas?.length) html += `<div class="dp-row"><span class="dp-label">Medical Areas</span><div>${chips(data.medical_areas)}</div></div>`;
+  } else if (isClinic) {
     html += row('Address',     data.address);
     html += row('Phone',       data.phone);
     html += row('Email',       data.email);
@@ -706,6 +912,94 @@ function showReviewTab(tab) {
   if (tab === 'graph') renderGraph();
 }
 
+// ── Forms step (step 4) ───────────────────────────────────
+const FORM_ICONS = { patient_intake_v1: '📋', hipaa_ack_v1: '🔒', phq9_v1: '🧠' };
+
+async function loadForms() {
+  if (availableForms.length) return;   // already loaded
+  try {
+    const res  = await fetch('/forms');
+    availableForms = await res.json();
+    // Default: select all
+    availableForms.forEach(f => selectedForms.add(f.form_id));
+  } catch(e) {
+    console.warn('Could not load forms:', e);
+  }
+}
+
+async function renderFormsStep() {
+  await loadForms();
+  const container = document.getElementById('forms-step-list');
+  container.innerHTML = '';
+
+  if (!availableForms.length) {
+    container.innerHTML = '<p style="color:var(--muted);font-size:.85rem;padding:20px 0">No intake forms found. Make sure the server is running.</p>';
+    return;
+  }
+
+  const grid = document.createElement('div');
+  grid.className = 'forms-grid';
+
+  availableForms.forEach(form => {
+    const sel  = selectedForms.has(form.form_id);
+    const card = document.createElement('div');
+    card.className = 'form-card' + (sel ? ' selected' : '');
+    card.dataset.formId = form.form_id;
+
+    card.innerHTML = `
+      <div class="form-card-thumb" onclick="openFormOverlay('${escHtml(form.form_id)}')">
+        <div class="form-mini-inner" id="fmi-${escHtml(form.form_id)}"></div>
+        <div class="fc-hint">Click to expand ↗</div>
+      </div>
+      <div class="form-card-footer">
+        <div class="form-card-name" title="${escHtml(form.title)}">${escHtml(form.title)}</div>
+        <input class="form-card-cb" type="checkbox" ${sel ? 'checked' : ''}
+               title="Select this form"
+               onchange="toggleFormCard('${escHtml(form.form_id)}', this.checked)"/>
+      </div>`;
+
+    grid.appendChild(card);
+  });
+
+  container.appendChild(grid);
+
+  // Populate mini previews after DOM is in place
+  availableForms.forEach(form => {
+    const mini = document.getElementById('fmi-' + form.form_id);
+    if (mini) mini.innerHTML = renderMiniFormHtml(form);
+  });
+
+  updateFormsCount();
+  syncFormsToTextView();
+}
+
+function toggleFormCard(fid, checked) {
+  checked ? selectedForms.add(fid) : selectedForms.delete(fid);
+  const card = document.querySelector(`.form-card[data-form-id="${fid}"]`);
+  if (card) card.classList.toggle('selected', checked);
+  updateFormsCount();
+  syncFormsToTextView();
+}
+
+function updateFormsCount() {
+  const el = document.getElementById('forms-selected-count');
+  if (el) el.textContent = `${selectedForms.size} form${selectedForms.size !== 1 ? 's' : ''} selected`;
+}
+
+function syncFormsToTextView() {
+  const el = document.getElementById('text-forms-chips');
+  if (!el) return;
+  if (selectedForms.size === 0) {
+    el.innerHTML = '<span style="color:var(--muted);font-size:.82rem">No forms selected.</span>';
+    return;
+  }
+  el.innerHTML = [...selectedForms].map(fid => {
+    const f    = availableForms.find(x => x.form_id === fid);
+    const icon = FORM_ICONS[fid] || '📄';
+    return `<span class="chip-tag" style="background:rgba(53,220,194,.1);color:#1a7a6e">${icon} ${escHtml(f ? f.title : fid)}</span>`;
+  }).join('');
+}
+
 // ── Save ──────────────────────────────────────────────────
 async function saveData() {
   collectEdits();
@@ -718,7 +1012,7 @@ async function saveData() {
     const res = await fetch('/save', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ clinic: extracted.clinic, providers: extracted.providers }),
+      body: JSON.stringify({ clinic: extracted.clinic, providers: extracted.providers, selected_forms: [...selectedForms] }),
     });
     const result = await res.json();
 
@@ -730,7 +1024,8 @@ async function saveData() {
 
     document.getElementById('stat-providers').textContent = result.providers_saved;
     document.getElementById('stat-clinic').textContent    = '#' + result.clinic_id;
-    goStep(4);
+    document.getElementById('stat-forms').textContent     = result.forms_linked || 0;
+    goStep(5);
   } catch (e) {
     alert('Network error: ' + e.message);
     btn.disabled = false; btn.textContent = '✓ Confirm & Save to Database';
@@ -739,20 +1034,23 @@ async function saveData() {
 
 // ── Cancel crawl and go back to step 1 ───────────────────
 function cancelAndBack() {
-  if (crawlAbort) { crawlAbort.abort(); crawlAbort = null; }
+  // if (crawlAbort) { crawlAbort.abort(); crawlAbort = null; }  // demo mode — no live request
   goStep(1);
 }
 
 // ── Restart ───────────────────────────────────────────────
 function restart() {
-  extracted = null;
+  extracted      = null;
+  availableForms = [];
+  selectedForms  = new Set();
   document.getElementById('clinic-name').value = '';
   document.getElementById('clinic-url').value  = '';
   document.getElementById('clinic-fields').innerHTML = '';
   document.getElementById('provider-list').innerHTML = '';
+  document.getElementById('forms-step-list').innerHTML = '<p style="color:var(--muted);font-size:.85rem">Loading forms…</p>';
   document.getElementById('step1-error').style.display = 'none';
   document.getElementById('btn-save').disabled = false;
-  document.getElementById('btn-save').textContent = '✓ Confirm & Save to Database';
+  document.getElementById('btn-save').textContent = '✓ Save to Database';
   showReviewTab('text');
   goStep(1);
 }
@@ -762,6 +1060,108 @@ function escHtml(str) {
   if (str == null) return '';
   return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
+
+// ── Form overlay ──────────────────────────────────────
+function openFormOverlay(fid) {
+  const form = availableForms.find(f => f.form_id === fid);
+  if (!form) return;
+  document.getElementById('form-overlay-title').textContent = form.title;
+  document.getElementById('form-overlay-body').innerHTML = renderFormFull(form);
+  document.getElementById('form-overlay').classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+}
+function closeFormOverlay() {
+  document.getElementById('form-overlay').classList.add('hidden');
+  document.body.style.overflow = '';
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeFormOverlay(); });
+
+function renderFormFull(form) {
+  let h = '';
+  if (form.instructions) h += `<div class="fo-instructions">${escHtml(form.instructions)}</div>`;
+  (form.sections || []).forEach(sec => {
+    h += `<div class="fo-section"><div class="fo-section-title">${escHtml(sec.title || '')}${sec.optional ? ' <span style="font-weight:400;color:var(--muted)">(Optional)</span>' : ''}</div><div class="fo-fields">`;
+    (sec.fields || []).forEach(f => {
+      const req  = f.required ? '<span class="fo-req">*</span>' : '';
+      const full = ['textarea','static_text','checkbox','signature'].includes(f.type) ? ' full' : '';
+      h += `<div class="fo-field${full}"><div class="fo-label">${escHtml(f.label || '')}${req}</div>`;
+      if (f.type === 'text' || f.type === 'email' || f.type === 'date' || f.type === 'time') {
+        const ph = f.type==='date' ? 'MM / DD / YYYY' : f.type==='time' ? 'HH : MM' : f.type==='email' ? 'email@example.com' : '';
+        h += `<div class="fo-input">${escHtml(ph)}</div>`;
+      } else if (f.type === 'select') {
+        h += `<div class="fo-input">${escHtml((f.options||[])[0]||'')} ▾</div>`;
+      } else if (f.type === 'textarea') {
+        h += `<div class="fo-input ta">Free text…</div>`;
+      } else if (f.type === 'radio') {
+        const scale = form.scale || [];
+        h += `<div class="fo-radio-row">` +
+          (f.options||[]).map(o => { const s=scale.find(x=>String(x.value)===o); return `<span class="fo-radio-opt"><span class="fo-radio-dot"></span>${escHtml(s?s.label:o)}</span>`; }).join('') + `</div>`;
+      } else if (f.type === 'checkbox') {
+        h += `<div class="fo-check-col">` + (f.options||[]).map(o=>`<span class="fo-check-opt"><span class="fo-check-box"></span>${escHtml(o)}</span>`).join('') + `</div>`;
+      } else if (f.type === 'static_text') {
+        h += `<div class="fo-static">${escHtml(f.value||'')}</div>`;
+      } else if (f.type === 'signature') {
+        h += `<div class="fo-input" style="font-style:italic;color:#b0bac6">✍ Digital signature</div>`;
+      }
+      h += `</div>`;
+    });
+    h += `</div></div>`;
+  });
+  if (form.scoring) {
+    h += `<div class="fo-scoring"><div class="fo-scoring-title">Scoring</div><div class="fo-score-ranges">` +
+      (form.scoring.ranges||[]).map(r=>`<span class="fo-score-range">${r.min}–${r.max}: ${escHtml(r.label)}</span>`).join('') + `</div></div>`;
+  }
+  return h;
+}
+
+// ── Mini thumbnail render (inline styles, scaled inside card) ──
+function renderMiniFormHtml(form) {
+  let h = `<div style="font-size:14px;font-weight:700;color:#1a2b3c;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid #e2e8f0">${escHtml(form.title)}</div>`;
+  if (form.instructions) h += `<div style="font-size:10px;color:#718096;margin-bottom:12px;line-height:1.45;font-style:italic;padding:6px 8px;background:#f0faf8;border-radius:4px">${escHtml(form.instructions.substring(0,140))}${form.instructions.length>140?'…':''}</div>`;
+  (form.sections||[]).forEach(sec => {
+    if (sec.title) h += `<div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#35dcc2;margin:12px 0 6px">${escHtml(sec.title)}</div>`;
+    h += `<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">`;
+    (sec.fields||[]).forEach(f => {
+      const full = ['textarea','static_text','checkbox','signature'].includes(f.type);
+      h += `<div style="grid-column:${full?'1/-1':'auto'}">`;
+      h += `<div style="font-size:9px;font-weight:600;color:#718096;margin-bottom:2px">${escHtml(f.label||'')}${f.required?' *':''}</div>`;
+      if (f.type==='static_text') {
+        h += `<div style="font-size:9px;color:#a0aec0;line-height:1.3;background:#f8fafc;padding:4px 6px;border-radius:3px;border:1px solid #e2e8f0">${escHtml((f.value||'').substring(0,100))}${(f.value||'').length>100?'…':''}</div>`;
+      } else if (f.type==='radio') {
+        const scale=form.scale||[];
+        h += `<div style="display:flex;flex-wrap:wrap;gap:3px">` +
+          (f.options||[]).slice(0,5).map(o=>{const s=scale.find(x=>String(x.value)===o);return `<span style="display:inline-flex;align-items:center;gap:3px;font-size:8px;color:#718096"><span style="width:9px;height:9px;border-radius:50%;border:1.5px solid #cbd5e0;display:inline-block;flex-shrink:0"></span>${escHtml(s?s.label:o)}</span>`;}).join('') + `</div>`;
+      } else if (f.type==='checkbox') {
+        h += `<div style="display:flex;flex-direction:column;gap:2px">` +
+          (f.options||[]).slice(0,3).map(o=>`<span style="display:inline-flex;align-items:center;gap:3px;font-size:8px;color:#718096"><span style="width:9px;height:9px;border-radius:2px;border:1.5px solid #cbd5e0;display:inline-block;flex-shrink:0"></span>${escHtml(o)}</span>`).join('') + `</div>`;
+      } else if (f.type==='textarea') {
+        h += `<div style="height:32px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:4px;padding:4px 6px;font-size:8px;color:#a0aec0">Free text…</div>`;
+      } else if (f.type==='signature') {
+        h += `<div style="height:24px;background:#f8fafc;border:1px dashed #cbd5e0;border-radius:4px;display:flex;align-items:center;padding:0 6px;font-size:8px;font-style:italic;color:#a0aec0">✍ Sign here</div>`;
+      } else if (f.type==='select') {
+        h += `<div style="height:24px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:4px;display:flex;align-items:center;justify-content:space-between;padding:0 6px"><span style="font-size:8px;color:#a0aec0">${escHtml((f.options||[])[0]||'Select…')}</span><span style="font-size:7px;color:#a0aec0">▾</span></div>`;
+      } else {
+        const ph = f.type==='date'?'MM/DD/YYYY':f.type==='email'?'email@example.com':'';
+        h += `<div style="height:24px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:4px;padding:0 6px;display:flex;align-items:center;font-size:8px;color:#a0aec0">${escHtml(ph)}</div>`;
+      }
+      h += `</div>`;
+    });
+    h += `</div>`;
+  });
+  return h;
+}
 </script>
+
+<!-- Form full-view overlay -->
+<div class="form-overlay hidden" id="form-overlay" onclick="if(event.target===this)closeFormOverlay()">
+  <div class="form-overlay-box">
+    <div class="form-overlay-hdr">
+      <div class="form-overlay-title" id="form-overlay-title"></div>
+      <button class="form-overlay-close" onclick="closeFormOverlay()">✕</button>
+    </div>
+    <div class="form-overlay-body" id="form-overlay-body"></div>
+  </div>
+</div>
+
 </body>
 </html>

@@ -1,0 +1,47 @@
+{
+  "form_id": "hipaa_ack_v1",
+  "title": "HIPAA Acknowledgement Form",
+  "sections": [
+    {
+      "title": "Patient Information",
+      "fields": [
+        {"type": "text", "label": "Full Name", "required": true},
+        {"type": "date", "label": "Date",      "required": true}
+      ]
+    },
+    {
+      "title": "Acknowledgement",
+      "fields": [
+        {
+          "type":  "static_text",
+          "label": "Notice",
+          "value": "I acknowledge that I have received and understand the Notice of Privacy Practices as required by the Health Insurance Portability and Accountability Act (HIPAA)."
+        },
+        {
+          "type":    "checkbox",
+          "label":   "Consent Items",
+          "required": true,
+          "options": [
+            "I understand my health information may be used for treatment, payment, and healthcare operations",
+            "I understand my rights to access, inspect, and amend my medical records",
+            "I understand I may revoke this consent at any time in writing"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Signature",
+      "fields": [
+        {"type": "signature", "label": "Digital Signature", "required": true},
+        {"type": "date",      "label": "Signature Date",    "required": true}
+      ]
+    }
+  ],
+  "metadata": {
+    "form_id": "hipaa_ack_v1",
+    "tags": ["legal", "compliance", "privacy", "hipaa"],
+    "medical_areas": ["Psychiatry", "Counselling", "Family Therapy", "Internal Medicine", "Orthopedics"],
+    "description": "HIPAA privacy acknowledgment form required for all patients — covers notice of privacy practices, patient rights, and consent",
+    "embedding_text": "HIPAA privacy acknowledgement form patient consent notice privacy practices health information rights access records compliance legal signature required all patients"
+  }
+}
